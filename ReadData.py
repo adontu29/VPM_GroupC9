@@ -7,7 +7,7 @@ ring_radius0 = 1.0  # m, radius of the vortex ring
 ring_strength0 = 1.0  # m²/s, vortex strength
 ring_thickness0 = 0.2 * ring_radius0  # m, thickness of the vortex ring
 
-### Particle Distribution Setup
+# Particle Distribution Setup
 
 Re = 7500  # Reynolds number
 
@@ -17,55 +17,87 @@ particle_viscosity0 = ring_strength0 / Re  # m²/s, kinematic viscosity
 time_step_size0 = 5 * particle_distance0 ** 2 / ring_strength0  # s
 n_time_steps0 = int(20 * ring_radius0 ** 2 / ring_strength0 / time_step_size0)
 
-
-import vtk
-
 # Read the VTP file
-reader = vtk.vtkXMLPolyDataReader()
-reader.SetFileName("dataset/Vortex_Ring_DNS_Re7500_0075.vtp")
-reader.Update()
-polydata = reader.GetOutput()
 
-# Extract points
-num_points = polydata.GetNumberOfPoints()
-points = np.array([polydata.GetPoint(i) for i in range(num_points)])
+def readVortexRingInstance(filename):
+    reader = vtk.vtkXMLPolyDataReader()
+    reader.SetFileName(filename)
+    reader.Update()
+    polydata = reader.GetOutput()
 
-# Extract point data
-point_data = {}
-for i in range(polydata.GetPointData().GetNumberOfArrays()):
-    name = polydata.GetPointData().GetArrayName(i)
-    data = np.array([polydata.GetPointData().GetArray(i).GetTuple(j) for j in range(num_points)])
-    point_data[name] = data
+    # Extract points
+    num_points = polydata.GetNumberOfPoints()
+    points = np.array([polydata.GetPoint(i) for i in range(num_points)])
 
-X = points[:, 0]
-Y = points[:, 1]
-Z = points[:, 2]
+    # Extract point data
+    point_data = {}
+    for i in range(polydata.GetPointData().GetNumberOfArrays()):
+        name = polydata.GetPointData().GetArrayName(i)
+        data = np.array([polydata.GetPointData().GetArray(i).GetTuple(j) for j in range(num_points)])
+        point_data[name] = data
 
-U = point_data['Velocity'][:,0]
-V = point_data['Velocity'][:,1]
-W = point_data['Velocity'][:,2]
+    X = points[:, 0]
+    Y = points[:, 1]
+    Z = points[:, 2]
 
-Wx = point_data['Strength'][:,0]
-Wy = point_data['Strength'][:,1]
-Wz = point_data['Strength'][:,2]
 
-Radius = point_data['Radius']
-Group_ID = point_data['Group_ID']
-Viscosity = point_data['Viscosity']
-Viscosity_t = point_data['Viscosity_t']
+    U = point_data['Velocity'][:, 0]
+    V = point_data['Velocity'][:, 1]
+    W = point_data['Velocity'][:, 2]
 
-# Print extracted data
-print(f"Points array shape: {points.shape}")
-print("Available point data fields:", list(point_data.keys()))
+    Wx = point_data['Strength'][:, 0]
+    Wy = point_data['Strength'][:, 1]
+    Wz = point_data['Strength'][:, 2]
 
+    Radius = point_data['Radius']
+    Group_ID = point_data['Group_ID']
+    Viscosity = point_data['Viscosity']
+    Viscosity_t = point_data['Viscosity_t']
+
+    return [X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t]
+
+
+
+
+X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
+
+Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
+PositionVector = np.sqrt(X ** 2 + Y ** 2 + Z ** 2)
+maxStrength = np.max(Strength_magnitude)
+Threshold = 0
+X_vp = X[Strength_magnitude > maxStrength*Threshold]
+Y_vp = Y[Strength_magnitude > maxStrength*Threshold]
+Z_vp = Z[Strength_magnitude > maxStrength*Threshold]
+Radius = Radius[Strength_magnitude > maxStrength*Threshold]
+Wx_vp = Wx[Strength_magnitude > maxStrength*Threshold]
+Wy_vp = Wy[Strength_magnitude > maxStrength*Threshold]
+Wz_vp = Wz[Strength_magnitude > maxStrength*Threshold]
+Strength_magnitude_vp = Strength_magnitude[Strength_magnitude > maxStrength*Threshold]
+
+Strength_total = sum(Strength_magnitude_vp)
+X_avg = 0
+Y_avg = 0
+Z_avg = 0
+Radius_avg = 0
+for i in range(len(Strength_magnitude_vp)):
+    weight = Strength_magnitude_vp[i]
+    X_avg += X_vp[i] * weight
+    Y_avg += Y_vp[i] * weight
+    Z_avg += Z_vp[i] * weight
+    Radius_avg += PositionVector[i] * weight
+
+X_avg /= Strength_total; Y_avg /= Strength_total; Z_avg /= Strength_total; Radius_avg /= Strength_total
+VortexRingPosition = tuple([X_avg, Y_avg,  Z_avg])
+
+print ("VortexRingPosition:", VortexRingPosition)
+print ("VortexRingRadius:", Radius_avg)
+
+plt.ion()
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
-ax.scatter(points[:,0], points[:,1], points[:,2], marker='o')
+p = ax.scatter(X_vp, Y_vp, Z_vp, c=Strength_magnitude_vp, marker='o')
+fig.colorbar(p)
 ax.set_xlabel('X Label')
 ax.set_ylabel('Y Label')
 ax.set_zlabel('Z Label')
 plt.show()
-
-
-
-
