@@ -1,5 +1,9 @@
 #import the needed modules
 import numpy as np
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath("ReadData.py")))  # Adds current directory
 import ReadData
 
 def radius_from_max_vorticity(filename):
@@ -19,4 +23,4 @@ def radius_from_max_vorticity(filename):
 
     return ring_radius, X_max_W, Y_max_W, Z_max_W
 
-print(radius_from_max_vorticity('Vortex_Ring_DNS_Re7500_0025.vtp'))
+print(radius_from_max_vorticity('Vortex_Ring_DNS_Re7500_0025'))
