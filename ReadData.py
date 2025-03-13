@@ -56,3 +56,35 @@ def readVortexRingInstance(filename):
 
     return [X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t]
 
+
+def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
+    Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
+    PositionVector = np.sqrt(Y ** 2 + Z ** 2)
+    maxStrength = np.max(Strength_magnitude)
+    Threshold = 0
+    X = X[Strength_magnitude > maxStrength * Threshold]
+    Y = Y[Strength_magnitude > maxStrength * Threshold]
+    Z = Z[Strength_magnitude > maxStrength * Threshold]
+    PositionVector = PositionVector[Strength_magnitude > maxStrength * Threshold]
+    Strength_magnitude = Strength_magnitude[Strength_magnitude > maxStrength * Threshold]
+
+    Strength_total = sum(Strength_magnitude)
+    X_avg = 0
+    Y_avg = 0
+    Z_avg = 0
+    Radius_avg = 0
+    for i in range(len(Strength_magnitude)):
+        weight = Strength_magnitude[i]
+        X_avg += X[i] * weight
+        Y_avg += Y[i] * weight
+        Z_avg += Z[i] * weight
+        Radius_avg += PositionVector[i] * weight
+
+    X_avg /= Strength_total
+    Y_avg /= Strength_total
+    Z_avg /= Strength_total
+    Radius_avg /= Strength_total
+    VortexRingPosition = tuple([X_avg, Y_avg, Z_avg])
+
+    return Radius_avg, VortexRingPosition
+
