@@ -18,3 +18,5 @@ def radius_from_max_vorticity(filename):
     ring_radius = np.sqrt(Y[idx_max_W]**2 + Z[idx_max_W]**2)
 
     return ring_radius, X_max_W, Y_max_W, Z_max_W
+
+print(radius_from_max_vorticity('Vortex_Ring_DNS_Re7500_0025'))
