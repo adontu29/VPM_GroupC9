@@ -58,13 +58,13 @@ Viscosity_t = point_data['Viscosity_t']
 print(f"Points array shape: {points.shape}")
 print("Available point data fields:", list(point_data.keys()))
 
-fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
-ax.scatter(points[:,0], points[:,1], points[:,2], marker='o')
-ax.set_xlabel('X Label')
-ax.set_ylabel('Y Label')
-ax.set_zlabel('Z Label')
-plt.show()
+# fig = plt.figure()
+# ax = fig.add_subplot(projection='3d')
+# ax.scatter(points[:,0], points[:,1], points[:,2], marker='o')
+# ax.set_xlabel('X Label')
+# ax.set_ylabel('Y Label')
+# ax.set_zlabel('Z Label')
+# plt.show()
 
 
 
