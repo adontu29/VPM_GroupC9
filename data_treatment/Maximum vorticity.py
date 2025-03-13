@@ -1,5 +1,9 @@
 #import the needed modules
 import numpy as np
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath("ReadData.py")))  # Adds current directory
 import ReadData
 
 def radius_from_max_vorticity(filename):
