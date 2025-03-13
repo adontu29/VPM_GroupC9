@@ -19,4 +19,4 @@ def radius_from_max_vorticity(filename):
 
     return ring_radius, X_max_W, Y_max_W, Z_max_W
 
-print(radius_from_max_vorticity('dataset/Vortex_Ring_DNS_Re7500_0025'))
+print(radius_from_max_vorticity('Vortex_Ring_DNS_Re7500_0025'))
