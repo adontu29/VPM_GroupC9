@@ -2,23 +2,19 @@
 import numpy as np
 import ReadData
 
-#take the vorticity arrays and positions
-omega_x = ReadData.Wx
-omega_y = ReadData.Wy
-omega_z = ReadData.Wz
-x = ReadData.X
-y = ReadData.Y
-z = ReadData.Z
+def radius_from_max_vorticity(filename):
+    #take the vorticity arrays and positions
+    [X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t] = ReadData.readVortexRingInstance(filename)
 
-#take magnitude of only y and z components
-omega_magnitude = np.sqrt(omega_y**2 + omega_z**2)
+    #take magnitude of only y and z components
+    W_magnitude = np.sqrt(Wy**2 + Wz**2)
 
-#find the maximum and its location
-max_omega = np.max(omega_magnitude)
-idx_max_omega = np.where(omega_magnitude == max_omega)
+    #find the maximum and its location
+    max_W = np.max(W_magnitude)
+    idx_max_W = np.where(W_magnitude == max_W)
 
-#Find the radius using the coordinates
-r_max_omega = np.sqrt(y[idx_max_omega]**2 + z[idx_max_omega]**2)
-ring_radius  = r_max_omega
+    #Find the radius using the coordinates
+    X_max_W, Y_max_W, Z_max_W = X[idx_max_W], Y[idx_max_W], Z[idx_max_W]
+    ring_radius = np.sqrt(Y[idx_max_W]**2 + Z[idx_max_W]**2)
 
-print(ring_radius)
+    return ring_radius, X_max_W, Y_max_W, Z_max_W
