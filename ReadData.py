@@ -84,7 +84,7 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
     Y_avg /= Strength_total
     Z_avg /= Strength_total
     Radius_avg /= Strength_total
-    VortexRingPosition = tuple([X_avg, Y_avg, Z_avg])
+    VortexRingPosition = [X_avg, Y_avg, Z_avg]
 
     return Radius_avg, VortexRingPosition
 

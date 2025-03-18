@@ -4,7 +4,7 @@ import ReadData
 
 def radius_from_max_vorticity(filename):
     #take the vorticity arrays and positions
-    [X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t] = ReadData.readVortexRingInstance(filename)
+    X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = ReadData.readVortexRingInstance(filename)
 
     #take magnitude of only y and z components
     W_magnitude = np.sqrt(Wy**2 + Wz**2)
