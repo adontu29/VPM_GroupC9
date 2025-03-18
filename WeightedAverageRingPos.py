@@ -47,3 +47,5 @@ ax.set_zlabel('Z Label')
 ax.set_aspect('equal', 'box')
 
 plt.show()
+
+print("heyyy")
