@@ -55,15 +55,16 @@ def findXPlane(vtrInstance, minx, maxx):
         print(vort2avg)
 
         if vort1avg > vort2avg:
-            findXPlane(vtrInstance, minx, middle)
+            return findXPlane(vtrInstance, minx, middle)
         else:
-            findXPlane(vtrInstance, middle, maxx)
+             return findXPlane(vtrInstance, middle, maxx)
 
     #elif numpart1 == 0 or numpart2 == 0 or vort1 == 0 or vort2 == 0:
     
     #print("I am here")
     #print(f"Variable: {middle}, Type: {type(middle).__name__}")
-    return middle
+    else:
+        return middle
 
 result = findXPlane(vtrInstance, minx, maxx)
 print(result)
