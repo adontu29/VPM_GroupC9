@@ -10,15 +10,17 @@ vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,
 minx = min(vtrInstance.x)
 maxx = max(vtrInstance.x)
 
-def findYPlane(vtrInstance, minx, maxx):
+def findXPlane(vtrInstance, minx, maxx):
     middle = (maxx + minx) / 2
     xs = np.ndarray.tolist(vtrInstance.x)
     wx = np.ndarray.tolist(vtrInstance.wx)
     wy = np.ndarray.tolist(vtrInstance.wy)
     wz = np.ndarray.tolist(vtrInstance.wz)
 
+    print("Positions:")
     print(minx)
     print(maxx)
+    print(middle)
 
     vort1 = 0
     numpart1 = 0
@@ -35,30 +37,33 @@ def findYPlane(vtrInstance, minx, maxx):
             vort2 = vort2 + absvort
             numpart2 = numpart2 + 1
 
-    print(vort1)
-    print(vort2)
+    #print(vort1)
+    #print(vort2)
 
-    if vort1 == 0:
+    """"if vort1 == 0:
         middle
-        findYPlane(vtrInstance, middle, maxx)
+        findXPlane(vtrInstance, middle, maxx)
     if vort2 == 0:
         maxx = middle
-        findYPlane(vtrInstance, minx, middle)
-
-    if numpart1 == 0 or numpart2 == 0:
-        return middle
+        findXPlane(vtrInstance, minx, middle)"""
     
-    vort1avg = vort1 / numpart1
-    vort2avg = vort2 / numpart2
-    print(vort1avg)
-    print(vort2avg)
+    if numpart1 != 0 and numpart2 != 0 and vort1 != 0 and vort2 != 0:
+        vort1avg = vort1 / numpart1
+        vort2avg = vort2 / numpart2
+        print("Average vorticities:")
+        print(vort1avg)
+        print(vort2avg)
 
-    if vort1avg > vort2avg:
-        maxx = middle
-    else:
-        minx = middle
+        if vort1avg > vort2avg:
+            findXPlane(vtrInstance, minx, middle)
+        else:
+            findXPlane(vtrInstance, middle, maxx)
 
-   
-    findYPlane(vtrInstance, minx, maxx)
+    #elif numpart1 == 0 or numpart2 == 0 or vort1 == 0 or vort2 == 0:
+    
+    #print("I am here")
+    #print(f"Variable: {middle}, Type: {type(middle).__name__}")
+    return middle
 
-print(findYPlane(vtrInstance, minx, maxx))
+result = findXPlane(vtrInstance, minx, maxx)
+print(result)
