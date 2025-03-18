@@ -9,7 +9,7 @@ ring_thickness0 = 0.2 * ring_radius0  # m, thickness of the vortex ring
 
 # Particle Distribution Setup
 
-Re = 7500  # Reynolds number
+Re = 75000  # Reynolds number
 
 particle_distance0 = 0.25 * ring_thickness0  # m
 particle_radius0 = 0.8 * particle_distance0 ** 0.5  # m
