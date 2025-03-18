@@ -12,6 +12,8 @@ def calcDist (instance1, instance2):
 timeStamps = np.arange(0,1575,25)
 Velocity = np.ones(len(timeStamps))
 ringRadius = np.ones(len(timeStamps))
+nu = np.ones(len(timeStamps))
+saffmanVelocity = np.ones(len(timeStamps))
 ringPos = []
 gamma = np.ones(len(timeStamps))
 
@@ -22,6 +24,7 @@ for i in range(len(timeStamps)):
 
     X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_' + zeros[4-len(stringtime)] + stringtime + '.vtp')
     ringRadius[i], ringPos0 = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
+    nu[i] = Viscosity[1][0]
     ringPos.append(ringPos0)
     strengthMagnitude = np.sqrt(Wx**2+Wy**2+Wz**2)
     gamma[i] = np.sum(strengthMagnitude)
@@ -33,21 +36,14 @@ for i in range(len(timeStamps)):
         Velocity[i] = calcDist(ringPos[i],ringPos[i-1])/(timeStamps[i]-timeStamps[i-1])*1000
     else:
         Velocity[i] = calcDist(ringPos[i+1],ringPos[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000
-
+    if (i!=0):
+        saffmanVelocity[i] = gamma[i]/(4*np.pi*ringRadius[i])*(np.log(4*ringRadius[i] / np.sqrt(nu[i] * timeStamps[i]/1000))-0.558 - 3.6716 * nu[i] * timeStamps[i]/1000 / ringRadius[i] ** 2)
 
 fig = plt.figure()
 ax = plt.axes()
-line = ax.plot(timeStamps, Velocity, 'b-')
+numVel = ax.plot(timeStamps, Velocity, 'b-')
+safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
+
 plt.show()
 
 # Creating the Animation object
-
-
-
-
-
-
-
-
-
-print("heyyy")
