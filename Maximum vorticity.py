@@ -39,6 +39,7 @@ def radius_from_max_vorticity(filename):
         ring_radius = np.sqrt(Y[idx_max_W]**2 + Z[idx_max_W]**2)
         ringRadius, ringPos = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
         Velocity[i] = m.sqrt((ringPos[0] - ringPos0[0])**2 + (ringPos[1] - ringPos0[1])**2 + (ringPos[2] - ringPos0[2])**2)/timeStamps[i]*1000
+        ringPos0 = ringPos
 
     return ring_radius, X_max_W, Y_max_W, Z_max_W
 
