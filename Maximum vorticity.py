@@ -1,8 +1,12 @@
 #import the needed modules
 import numpy as np
+import pandas as pd
+import scipy as sp
 import ReadData as rd
 import math as m
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 
 def RadiusVelocityPlotsFromMaxVorticity():
 
@@ -70,9 +74,28 @@ def RadiusVelocityPlotsFromMaxVorticity():
     line, = ax.plot(timeStamps, Velocity, 'b-')
     plt.show()
 
-    return(ringRadiusLst,ringPosLst)
+    return(ringRadiusLst,ringPosLst,Velocity,timeStamps)
 
-ringRadiusLst, ringPosLst = RadiusVelocityPlotsFromMaxVorticity()
+ringRadiusLst, ringPosLst, Velocity, timeStamps = RadiusVelocityPlotsFromMaxVorticity()
+
+def preprocessing(X,y):
+    X_avg = np.mean(X)
+    y_avg = np.mean(y)
+    return(X,y)
+
+X,y = preprocessing(timeStamps,Velocity)    
+
+def linearRegression(XTrain,yTrain):
+    model = LinearRegression()
+    model.fit(XTrain.reshape(-1, 1), yTrain)
+    return(model)
+
+model = linearRegression(X,y)
+
+y_pred = model.predict(X)
+
+     
+    
 
 
 
