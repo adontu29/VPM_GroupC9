@@ -5,11 +5,15 @@ import math as m
 from matplotlib import pyplot as plt
 
 def RadiusVelocityPlotsFromMaxVorticity():
+    def calcDist (instance1, instance2):
+        h = instance1 - instance2
+        return h
+    
     ringPosLst = []
     ringRadiusLst = []
     X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
     
-    timeStamps = np.arange(25,1575,25)
+    timeStamps = np.arange(0,1575,25)
     Velocity = np.ones(len(timeStamps))
     WMagnitude = np.sqrt(Wy**2 + Wz**2)
 
@@ -18,18 +22,16 @@ def RadiusVelocityPlotsFromMaxVorticity():
     IdxMaxW = np.where(WMagnitude == MaxW)
 
     #Find the radius using the coordinates
-    XMaxW, YMaxW, ZMaxW = X[IdxMaxW], Y[IdxMaxW], Z[IdxMaxW]
-    ringPos0 = tuple([XMaxW, YMaxW, ZMaxW])
-    ringRadius0 = np.sqrt(Y[IdxMaxW]**2 + Z[IdxMaxW]**2)
+    XMaxW, YMaxW, ZMaxW = X[IdxMaxW][0], Y[IdxMaxW][0], Z[IdxMaxW][0]
+    ringPosLst.append(YMaxW)
+    ringRadiusLst.append(np.sqrt(Y[IdxMaxW]**2 + Z[IdxMaxW]**2))
 
-    ringPosLst.append(ringPos0)
-    ringRadiusLst.append(ringRadius0)
                     
 
     for i in range(len(timeStamps)):
         zeros = ['', '0', '00', '000', '0000']
         stringtime = str(timeStamps[i])
-        print(stringtime, zeros[4-len(stringtime)])
+
 
         X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_' + zeros[4-len(stringtime)] + stringtime + '.vtp')
 
@@ -39,14 +41,21 @@ def RadiusVelocityPlotsFromMaxVorticity():
         #find the maximum and its location
         MaxW = np.max(WMagnitude)
         IdxMaxW = np.where(WMagnitude == MaxW)
-        XMaxW, YMaxW, ZMaxW= X[IdxMaxW], Y[IdxMaxW], Z[IdxMaxW]
-        ringRadius = np.sqrt(Y[IdxMaxW]**2 + Z[IdxMaxW]**2)
-        ringPos = tuple([XMaxW, YMaxW, ZMaxW])
-        Velocity[i] = m.sqrt((ringPos[0] - ringPos0[0])**2 + (ringPos[1] - ringPos0[1])**2 + (ringPos[2] - ringPos0[2])**2)/timeStamps[i]*1000
-        ringPosLst.append(ringPos)
-        ringRadiusLst.append(ringRadius)
-        ringPos0 = ringPos
-        ringRadius0 = ringRadius
+        XMaxW, YMaxW, ZMaxW = X[IdxMaxW][0], Y[IdxMaxW][0], Z[IdxMaxW][0]
+        print(XMaxW)
+        #print(YMaxW)
+        #print(ZMaxW)
+        ringRadiusLst.append(np.sqrt(Y[IdxMaxW]**2 + Z[IdxMaxW]**2))
+        ringPosLst.append(XMaxW)
+
+    
+    for i in range(len(timeStamps)):
+            if (i==0):
+                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i])/(timeStamps[i+1]-timeStamps[i])*1000
+            elif (i==len(timeStamps)-1):
+                Velocity[i] = calcDist(ringPosLst[i],ringPosLst[i-1])/(timeStamps[i]-timeStamps[i-1])*1000
+            else:
+                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000
     fig = plt.figure()
     ax = plt.axes()
 
