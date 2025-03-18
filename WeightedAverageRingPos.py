@@ -1,27 +1,40 @@
 import vtk
 import numpy as np
+import math as m
 import matplotlib.pyplot as plt
 import ReadData as rd
-X0,Y0,Z0,U0,V0,W0,Wx0,Wy0,Wz0,Radius0,Group_ID0,Viscosity0,Viscosity_t0 = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
+import matplotlib.animation as animation
 
-timeStamps = np.arange(0,1575,25)
-for i in timeStamps:
+X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
+ringRadius0, ringPos0 = rd.getRingPosRadius(X,Y,Z,Wx,Wy,Wz)
+Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
+
+
+
+
+timeStamps = np.arange(25,1575,25)
+Velocity = np.ones(len(timeStamps))
+for i in range(len(timeStamps)):
     zeros = ['', '0', '00', '000', '0000']
-    stringtime = str(i)
-    print(stringtime, 4-len(stringtime))
+    stringtime = str(timeStamps[i])
+    print(stringtime, zeros[4-len(stringtime)])
+
+    X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_' + zeros[4-len(stringtime)] + stringtime + '.vtp')
+    ringRadius, ringPos = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
+    Velocity[i] = m.sqrt((ringPos[0] - ringPos0[0])**2 + (ringPos[1] - ringPos0[1])**2 + (ringPos[2] - ringPos0[2])**2)/timeStamps[i]*1000
 
 
-# plt.ion()
-# fig = plt.figure()
-# ax = fig.add_subplot(projection='3d')
-# p = ax.scatter(X, Y, Z, c=Strength_magnitude, marker='o')
-# fig.colorbar(p)
-# ax.set_xlabel('X')
-# ax.set_ylabel('Y')
-# ax.set_zlabel('Z')
-# ax.set_aspect('equal', 'box')
+fig = plt.figure()
+ax = plt.axes()
 
-# plt.show()
+line, = ax.plot(timeStamps, Velocity, 'b-')
+plt.show()
+
+# Creating the Animation object
+
+
+
+
 
 
 
