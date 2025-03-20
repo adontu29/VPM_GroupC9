@@ -104,11 +104,3 @@ def linearRegression(XTrain,yTrain):
 model = linearRegression(X,y)
 
 y_pred = model.predict(X)
-
-     
-    
-
-
-
-
-
