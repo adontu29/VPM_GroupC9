@@ -78,21 +78,29 @@ def RadiusVelocityPlotsFromMaxVorticity():
 
 ringRadiusLst, ringPosLst, Velocity, timeStamps = RadiusVelocityPlotsFromMaxVorticity()
 
-def preprocessing(X,y):
-    X_avg = np.mean(X)
-    y_avg = np.mean(y)
-    return(X,y)
 
-X,y = preprocessing(timeStamps,Velocity)    
+'''
+What I am trying to do here is to implement some polynomial regression. 
+If you run the file you will see the data obtained is quite noisy.
+Maybe by doing that we can obtain a more accurate reading of the data.
+You can compare with the weighted average method as that is meant to be the most accurate.
+'''
 
-def linearRegression(XTrain,yTrain):
-    model = LinearRegression()
-    model.fit(XTrain.reshape(-1, 1), yTrain)
-    return(model)
+# def preprocessing(X,y):
+#     X_avg = np.mean(X)
+#     y_avg = np.mean(y)
+#     return(X,y)
 
-model = linearRegression(X,y)
+# X,y = preprocessing(timeStamps,Velocity)    
 
-y_pred = model.predict(X)
+# def linearRegression(XTrain,yTrain):
+#     model = LinearRegression()
+#     model.fit(XTrain.reshape(-1, 1), yTrain)
+#     return(model)
+
+# model = linearRegression(X,y)
+
+# y_pred = model.predict(X)
 
      
     
