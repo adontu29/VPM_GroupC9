@@ -35,7 +35,7 @@ def RadiusVelocityPlotsFromMaxVorticity():
 
         X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_' + zeros[4-len(stringtime)] + stringtime + '.vtp')
 
-        #take magnitude of only y and z components
+        #take magnitude of only y and z comenponents
         WMagnitude = np.sqrt(Wy**2 + Wz**2)
 
         #find the maximum and its location
