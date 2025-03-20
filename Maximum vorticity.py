@@ -37,10 +37,11 @@ def RadiusVelocityPlotsFromMaxVorticity():
     X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
 
     # defines the timestamps and sets the length of the velocity array
-    timeStamps = np.arange(25,1575,25)
+    timeStampMultiplyer = 2
+    timeStamps = np.arange(25*timeStampMultiplyer,1575,25*timeStampMultiplyer)
     Velocity = np.ones(len(timeStamps))
 
-    # obtains the magnitude of the vorticyty in the Y and Z direction, as the one in the X direction represents swirl
+    # obtains the magnitude of the vorticity in the Y and Z direction, as the one in the X direction represents swirl
     WMagnitude = np.sqrt(Wy**2 + Wz**2)
 
     # finds the maximums and their locations
@@ -69,7 +70,7 @@ def RadiusVelocityPlotsFromMaxVorticity():
         IdxMaxW = np.where(WMagnitude == MaxW)
         IdxThreshold = np.where(WMagnitude > WThreshold)
 
-        # because an array/list might be created from there being more than one identical plarticle, a value is chosen to make sure we get a scalar
+        # because an array/list might be created from there being more than one identical particle, a value is chosen to make sure we get a scalar
         XMaxW, YMaxW, ZMaxW = X[IdxMaxW][0], Y[IdxMaxW][0], Z[IdxMaxW][0]
 
         # the lists are updated
@@ -89,7 +90,8 @@ def RadiusVelocityPlotsFromMaxVorticity():
     return(ringRadiusLst,ringPosLst,Velocity,timeStamps)
 
 ringRadiusLst, ringPosLst, Velocity, timeStamps = RadiusVelocityPlotsFromMaxVorticity()
-
+print((ringPosLst))
+print(Velocity)
 
 
 fig = plt.figure()
