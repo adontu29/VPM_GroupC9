@@ -8,6 +8,16 @@ from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
+'''
+Do pip install for the scikit module
+pip install scikit-learn
+'''
+
+'''
+This funtion looks the particle with the highest vorticity and finds its location.
+Because the particle will be located at the core we can approximate the ring velocity by observing the change in x position of said highest vorticity particles
+'''
+
 def RadiusVelocityPlotsFromMaxVorticity():
 
     # calculates the h value for numerical differentiation 
