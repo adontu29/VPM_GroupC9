@@ -14,49 +14,64 @@ Velocity = np.ones(len(timeStamps))
 ringRadius = np.ones(len(timeStamps))
 nu = np.ones(len(timeStamps))
 saffmanVelocity = np.ones(len(timeStamps))
-saffmanSimplified = np.zeros(len(timeStamps))
 ringPos = []
 gamma = np.ones(len(timeStamps))
 
 for i in range(len(timeStamps)):
     zeros = ['', '0', '00', '000', '0000']
-    stringtime = str(timeStamps[i])
+    # Debugged: Use zfill(4) instead of manual padding
+    stringtime = str(timeStamps[i]).zfill(4)
     #print(stringtime, zeros[4-len(stringtime)])
 
-    X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_' + zeros[4-len(stringtime)] + stringtime + '.vtp')
+    # Debugged: Ensure correct file path format
+    filename = f'dataset/Vortex_Ring_DNS_Re7500_{stringtime}.vtp'
+
+    try:
+        X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance(filename)
+    except FileNotFoundError:
+        print(f"Error: File {filename} not found.")
+        continue
+
+    # Debugged: Properly unpack ring position
     ringRadius[i], ringPos0 = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
-    nu[i] = Viscosity[1][0]
-    ringPos.append(ringPos0)
-    strengthMagnitude = np.sqrt(Wx**2+Wy**2+Wz**2)
-    gamma[i] = nu[i]*7500
 
-timeStampsSec = timeStamps/1000
-for i in range(len(timeStampsSec)):
-    if (i==0):
-        Velocity[i] = calcDist(ringPos[i+1],ringPos[i])/(timeStampsSec[i+1]-timeStampsSec[i])
-    elif (i==len(timeStampsSec)-1):
-        Velocity[i] = calcDist(ringPos[i],ringPos[i-1])/(timeStampsSec[i]-timeStampsSec[i-1])
+    # Debugged: Ensure `Viscosity` is accessed correctly
+    if np.ndim(Viscosity) == 1:
+        nu[i] = Viscosity[0]
     else:
-        Velocity[i] = calcDist(ringPos[i+1],ringPos[i-1])/(timeStampsSec[i+1]-timeStampsSec[i-1])
+        nu[i] = Viscosity[1][0]
+
+    # Debugged: Convert ringPos to array for safer indexing
+    ringPos.append(np.array(ringPos0))
+
+    # Debugged: Ensure `gamma[i]` is properly computed
+    strengthMagnitude = np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2)
+    gamma[i] = np.sum(strengthMagnitude)
+
+# Debugged: Ensure ringPos is properly structured
+ringPos = np.array(ringPos)
+
+for i in range(len(timeStamps)):
+    if (i==0):
+        Velocity[i] = calcDist(ringPos[i+1],ringPos[i])/(timeStamps[i+1]-timeStamps[i])*1000
+    elif (i==len(timeStamps)-1):
+        Velocity[i] = calcDist(ringPos[i],ringPos[i-1])/(timeStamps[i]-timeStamps[i-1])*1000
+    else:
+        Velocity[i] = calcDist(ringPos[i+1],ringPos[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000
     if (i!=0):
-        saffmanVelocity[i] = gamma[i]/(4*np.pi*ringRadius[i])*(np.log(4*ringRadius[i] / np.sqrt(nu[i] * timeStampsSec[i]))-0.558 - 3.6716 * nu[i] * timeStampsSec[i] / ringRadius[i] ** 2)
-        #saffmanSimplified[i] = gamma[i]/(4*np.pi*ringRadius[i])*(np.log(4*ringRadius[i] / np.sqrt(nu[i] * timeStamps[i]/1000))-0.558)
-fig = plt.figure(1)
+        eps = 1e-8
+        saffmanVelocity[i] = (gamma[i]/(4*np.pi*ringRadius[i]))*(np.log(4*ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]/1000) + eps)) -0.558 - 3.6716 * nu[i] * timeStamps[i]/1000 / (ringRadius[i] ** 2))
+fig = plt.figure()
 ax = plt.axes()
-#vorticity_magnitude = (ring_strength/(np.pi*ring_thickness**2)) * np.exp(-radial_distance_to_core**2/ring_thickness**2)
-numVel = ax.plot(timeStamps/1000, Velocity, 'b-')
-safVel = ax.plot(timeStamps[1:len(timeStamps)-1]/1000, saffmanVelocity[1:len(timeStamps)-1], 'r-')
-ax.legend(['VPM Velocity'])
+numVel = ax.plot(timeStamps, Velocity, 'b-')
+safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
 
-fig2 = plt.figure(2)
-ax = plt.axes()
-radRing = ax.plot(timeStamps/1000, ringRadius, 'g-')
-ax.legend(['Ring Radius'])
-
-fig3 = plt.figure(3)
-ax = plt.axes()
-radRing = ax.plot(timeStamps/1000, ringPos, 'g-')
-ax.legend(['Ring Position'])
 plt.show()
+
+print(f"gamma[{i}] =", gamma[i])
+print(f"ringRadius[{i}] =", ringRadius[i])
+print(f"nu[{i}] =", nu[i])
+print(f"timeStamps[{i}] =", timeStamps[i] / 1000)
+print(f"saffmanVelocity[{i}] =", saffmanVelocity[i])
+
 # Creating the Animation object
-print(gamma)
