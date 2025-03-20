@@ -75,8 +75,6 @@ def RadiusVelocityPlotsFromMaxVorticity():
             else:
                 Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000 # central difference formula
 
-    
-
     return(ringRadiusLst,ringPosLst,Velocity,timeStamps)
 
 ringRadiusLst, ringPosLst, Velocity, timeStamps = RadiusVelocityPlotsFromMaxVorticity()
