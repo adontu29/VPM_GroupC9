@@ -2,12 +2,13 @@
 These files were generated with the following setup:
 
 ### Properties of the Vortex Ring
-```python
+'''
+python
 ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
 ring_radius     = 1.0               # m, radius of the vortex ring
 ring_strength   = 1.0               # m²/s, vortex strength
 ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
-```
+'''
 
 ### Particle Distribution Setup
 ```python
