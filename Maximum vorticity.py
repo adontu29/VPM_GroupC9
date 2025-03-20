@@ -27,7 +27,7 @@ def RadiusVelocityPlotsFromMaxVorticity():
     X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
     
     # defines the timestamps and sets the length of the velocity array
-    timeStampMultiplyer = 2
+    timeStampMultiplyer = 1
     timeStamps = np.arange(25*timeStampMultiplyer,1575,25*timeStampMultiplyer)
     Velocity = np.ones(len(timeStamps))
 
@@ -75,32 +75,27 @@ def RadiusVelocityPlotsFromMaxVorticity():
             else:
                 Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000 # central difference formula
 
-    
-
     return(ringRadiusLst,ringPosLst,Velocity,timeStamps)
 
 ringRadiusLst, ringPosLst, Velocity, timeStamps = RadiusVelocityPlotsFromMaxVorticity()
 print((ringPosLst))
 print(Velocity)
 
+def regressionM(X, y, M):
+    coeffs = np.polyfit(X, y, M)
+    return(coeffs)
+
+def function(X, a, b, c):
+    y = a * X ** 2 + b * X + c
+    return y
+
+coeffs = regressionM(timeStamps, Velocity, 2)
+a, b, c = coeffs
 
 fig = plt.figure()
 ax = plt.axes()
 
 line, = ax.plot(timeStamps, Velocity, 'b-')
+line, = ax.plot(timeStamps, function(timeStamps,a,b,c), 'r-')
+
 plt.show()
-def preprocessing(X,y):
-    X_avg = np.mean(X)
-    y_avg = np.mean(y)
-    return(X,y)
-
-X,y = preprocessing(timeStamps,Velocity)    
-
-def linearRegression(XTrain,yTrain):
-    model = LinearRegression()
-    model.fit(XTrain.reshape(-1, 1), yTrain)
-    return(model)
-
-model = linearRegression(X,y)
-
-y_pred = model.predict(X)
