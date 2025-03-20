@@ -61,10 +61,17 @@ for i in range(len(timeStamps)):
     if (i!=0):
         eps = 1e-8
         saffmanVelocity[i] = (gamma[i]/(4*np.pi*ringRadius[i]))*(np.log(4*ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]/1000) + eps)) -0.558 - 3.6716 * nu[i] * timeStamps[i]/1000 / (ringRadius[i] ** 2))
+plt.subplot(121)
 fig = plt.figure()
 ax = plt.axes()
 numVel = ax.plot(timeStamps, Velocity, 'b-')
 safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
+
+plt.subplot(122)
+Energy = 0.5 * Velocity ** 2
+plt.plot(timeStamps, Energy, 'k-')
+plt.scatter(timeStamps, Energy, c="red", edgecolors='black')
+
 
 plt.show()
 
