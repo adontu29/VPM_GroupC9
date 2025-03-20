@@ -90,6 +90,8 @@ def RadiusVelocityPlotsFromMaxVorticity():
 
 ringRadiusLst, ringPosLst, Velocity, timeStamps = RadiusVelocityPlotsFromMaxVorticity()
 
+
+
 fig = plt.figure()
 ax = plt.axes()
 
