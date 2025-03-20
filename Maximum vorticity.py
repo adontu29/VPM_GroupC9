@@ -5,6 +5,7 @@ import scipy as sp
 import ReadData as rd
 import math as m
 from matplotlib import pyplot as plt
+import matplotlib.animation as animation
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
 
@@ -28,6 +29,9 @@ def RadiusVelocityPlotsFromMaxVorticity():
     # list definitions
     ringPosLst = []
     ringRadiusLst = []
+
+    #Threshold
+    threshold = 0.5
 
     # reads the 1st datafile and extracts the needed information
     X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
@@ -61,7 +65,9 @@ def RadiusVelocityPlotsFromMaxVorticity():
 
         # find the maximums and their locations
         MaxW = np.max(WMagnitude)
+        WThreshold = MaxW * threshold
         IdxMaxW = np.where(WMagnitude == MaxW)
+        IdxThreshold = np.where(WMagnitude > WThreshold)
 
         # because an array/list might be created from there being more than one identical plarticle, a value is chosen to make sure we get a scalar
         XMaxW, YMaxW, ZMaxW = X[IdxMaxW][0], Y[IdxMaxW][0], Z[IdxMaxW][0]
@@ -78,16 +84,17 @@ def RadiusVelocityPlotsFromMaxVorticity():
             else:
                 Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000 # central difference formula
 
-    fig = plt.figure()
-    ax = plt.axes()
-
-    line, = ax.plot(timeStamps, Velocity, 'b-')
-    plt.show()
+    
 
     return(ringRadiusLst,ringPosLst,Velocity,timeStamps)
 
 ringRadiusLst, ringPosLst, Velocity, timeStamps = RadiusVelocityPlotsFromMaxVorticity()
 
+fig = plt.figure()
+ax = plt.axes()
+
+line, = ax.plot(timeStamps, Velocity, 'b-')
+plt.show()
 
 '''
 What I am trying to do here is to implement some polynomial regression. 
