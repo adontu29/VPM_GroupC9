@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class VortexRingInstance:
     def __init__(self, X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t):
@@ -15,3 +16,4 @@ class VortexRingInstance:
         self.group_ID = Group_ID
         self.viscosity = Viscosity
         self.viscosity_t = Viscosity_t
+        self.rad = np.sqrt(np.multiply(Y, Y) + np.multiply(Z, Z))
