@@ -12,7 +12,7 @@ def calcDist (instance1, instance2):
 
 #load an instance of the dataset and create a VortexRingInstance object for it
 x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = rd.readVortexRingInstance(
-    "C:/Users/alina/Documents/GitHub/VPM_GroupC9/dataset/Vortex_Ring_DNS_Re7500_0025.vtp")
+    "Vortex_Ring_DNS_Re7500_0025.vtp")
 
 print(sys.path)
 vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
@@ -40,7 +40,7 @@ def findXPlane(vtrInstance, minx, maxx):
 
     #iterate through all particle x-positions, calculate the absolute value of the particle's vorticity and increment respective variable
     for pos in xs:
-        absvort = math.sqrt(math.sqrt(wx[xs.index(pos)]**2 + wy[xs.index(pos)]**2 + wz[xs.index(pos)]**2))
+        absvort = math.sqrt(math.sqrt(wy[xs.index(pos)]**2 + wz[xs.index(pos)]**2))
         if pos >= minx and pos <= middle: 
             vort1 = vort1 + absvort
             numpart1 = numpart1 + 1
@@ -85,7 +85,7 @@ def findRad(vtrInstance, minr, maxr):
 
     #iterate through all particle radii, calculate the absolute value of the particle's vorticity and increment respective variable
     for radius in radii:
-        absvort = math.sqrt(math.sqrt(wx[radii.index(radius)]**2 + wy[radii.index(radius)]**2 + wz[radii.index(radius)]**2))
+        absvort = math.sqrt(math.sqrt(wy[radii.index(radius)]**2 + wz[radii.index(radius)]**2))
         if radius >= minr and radius <= middle: 
             vort1 = vort1 + absvort
             numpart1 = numpart1 + 1
@@ -94,7 +94,7 @@ def findRad(vtrInstance, minr, maxr):
             numpart2 = numpart2 + 1
     
     #if both halfs of domain still contain particles, calculate average vorticities, use domain half with higher avg vorticity and repeat algorithm
-    if numpart1 != 0 and numpart2 != 0:
+    if numpart1 > 100 and numpart2 > 100:
         vort1avg = vort1 / numpart1
         vort2avg = vort2 / numpart2
 
@@ -115,6 +115,10 @@ saffmanVelocity = np.ones(len(timeStamps))
 ringPos = []
 gamma = np.ones(len(timeStamps))
 
+ttab = []
+rtab = []
+xtab = []
+
 for i in range(len(timeStamps)):
     zeros = ['', '0', '00', '000', '0000']
     # Debugged: Use zfill(4) instead of manual padding
@@ -122,7 +126,8 @@ for i in range(len(timeStamps)):
     #print(stringtime, zeros[4-len(stringtime)])
 
     # Debugged: Ensure correct file path format
-    filename = f'C:/Users/alina/Documents/GitHub/VPM_GroupC9/dataset/Vortex_Ring_DNS_Re7500_{stringtime}.vtp'
+    filename = f'../dataset/Vortex_Ring_DNS_Re7500_{stringtime}.vtp'
+
 
     try:
         X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance(filename)
@@ -132,6 +137,14 @@ for i in range(len(timeStamps)):
 
     # Debugged: Properly unpack ring position
     ringRadius[i], ringPos0 = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
+    vtrInstance = VortexRingInstance(X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t)
+    maxr = max(vtrInstance.rad)
+    minr = min(vtrInstance.rad)
+    minx = min(vtrInstance.x)
+    maxx = max(vtrInstance.x)
+
+    #plotting of x-plane function
+
 
     # Debugged: Ensure `Viscosity` is accessed correctly
     if np.ndim(Viscosity) == 1:
@@ -139,35 +152,33 @@ for i in range(len(timeStamps)):
     else:
         nu[i] = Viscosity[1][0]
 
+    ttab.append(float(stringtime)/1000)
+    rtab.append(findRad(vtrInstance,minr,maxr))
+    xtab.append(findXPlane(vtrInstance,minx,maxx))
+
+
     # Debugged: Convert ringPos to array for safer indexing
     ringPos.append(np.array(ringPos0))
 
     # Debugged: Ensure `gamma[i]` is properly computed
     strengthMagnitude = np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2)
     gamma[i] = np.sum(strengthMagnitude)
-
+    #print(findRad(vtrInstance,minr,maxr))
 # Debugged: Ensure ringPos is properly structured
 ringPos = np.array(ringPos)
 
-for i in range(len(timeStamps)):
-    if (i==0):
-        Velocity[i] = calcDist(ringPos[i+1],ringPos[i])/(timeStamps[i+1]-timeStamps[i])*1000
-    elif (i==len(timeStamps)-1):
-        Velocity[i] = calcDist(ringPos[i],ringPos[i-1])/(timeStamps[i]-timeStamps[i-1])*1000
-    else:
-        Velocity[i] = calcDist(ringPos[i+1],ringPos[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000
-    if (i!=0):
-        eps = 1e-8
-        saffmanVelocity[i] = (gamma[i]/(4*np.pi*ringRadius[i]))*(np.log(4*ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]/1000) + eps)) -0.558 - 3.6716 * nu[i] * timeStamps[i]/1000 / (ringRadius[i] ** 2))
-fig = plt.figure()
-ax = plt.axes()
-numVel = ax.plot(timeStamps, Velocity, 'b-')
-safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
+#plotting
+#plt.plot(ttab,rtab)
+plt.plot(ttab,xtab)
 
 plt.show()
 
-print(f"gamma[{i}] =", gamma[i])
-print(f"ringRadius[{i}] =", ringRadius[i])
-print(f"nu[{i}] =", nu[i])
-print(f"timeStamps[{i}] =", timeStamps[i] / 1000)
-print(f"saffmanVelocity[{i}] =", saffmanVelocity[i])
+
+#to-do thursday:
+#plot the velocity graph
+
+#print(f"gamma[{i}] =", gamma[i])
+#print(f"ringRadius[{i}] =", ringRadius[i])
+#print(f"nu[{i}] =", nu[i])
+#print(f"timeStamps[{i}] =", timeStamps[i] / 1000)
+#print(f"saffmanVelocity[{i}] =", saffmanVelocity[i])
