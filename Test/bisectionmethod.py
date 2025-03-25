@@ -40,7 +40,7 @@ def findXPlane(vtrInstance, minx, maxx):
 
     #iterate through all particle x-positions, calculate the absolute value of the particle's vorticity and increment respective variable
     for pos in xs:
-        absvort = math.sqrt(math.sqrt(wx[xs.index(pos)]**2 + wy[xs.index(pos)]**2 + wz[xs.index(pos)]**2))
+        absvort = math.sqrt(math.sqrt(wy[xs.index(pos)]**2 + wz[xs.index(pos)]**2))
         if pos >= minx and pos <= middle: 
             vort1 = vort1 + absvort
             numpart1 = numpart1 + 1
@@ -85,7 +85,7 @@ def findRad(vtrInstance, minr, maxr):
 
     #iterate through all particle radii, calculate the absolute value of the particle's vorticity and increment respective variable
     for radius in radii:
-        absvort = math.sqrt(math.sqrt(wx[radii.index(radius)]**2 + wy[radii.index(radius)]**2 + wz[radii.index(radius)]**2))
+        absvort = math.sqrt(math.sqrt(wy[radii.index(radius)]**2 + wz[radii.index(radius)]**2))
         if radius >= minr and radius <= middle: 
             vort1 = vort1 + absvort
             numpart1 = numpart1 + 1
@@ -94,7 +94,7 @@ def findRad(vtrInstance, minr, maxr):
             numpart2 = numpart2 + 1
     
     #if both halfs of domain still contain particles, calculate average vorticities, use domain half with higher avg vorticity and repeat algorithm
-    if numpart1 != 0 and numpart2 != 0:
+    if numpart1 > 100 and numpart2 > 100:
         vort1avg = vort1 / numpart1
         vort2avg = vort2 / numpart2
 
@@ -117,6 +117,7 @@ gamma = np.ones(len(timeStamps))
 
 ttab = []
 rtab = []
+xtab = []
 
 for i in range(len(timeStamps)):
     zeros = ['', '0', '00', '000', '0000']
@@ -142,14 +143,19 @@ for i in range(len(timeStamps)):
     minx = min(vtrInstance.x)
     maxx = max(vtrInstance.x)
 
+    #plotting of x-plane function
+
+
     # Debugged: Ensure `Viscosity` is accessed correctly
     if np.ndim(Viscosity) == 1:
         nu[i] = Viscosity[0]
     else:
         nu[i] = Viscosity[1][0]
 
-    ttab.append(stringtime*1000)
+    ttab.append(float(stringtime)/1000)
     rtab.append(findRad(vtrInstance,minr,maxr))
+    xtab.append(findXPlane(vtrInstance,minx,maxx))
+
 
     # Debugged: Convert ringPos to array for safer indexing
     ringPos.append(np.array(ringPos0))
@@ -162,10 +168,14 @@ for i in range(len(timeStamps)):
 ringPos = np.array(ringPos)
 
 #plotting
-plt.plot(ttab,rtab)
-
+#plt.plot(ttab,rtab)
+plt.plot(ttab,xtab)
 
 plt.show()
+
+
+#to-do thursday:
+#plot the velocity graph
 
 #print(f"gamma[{i}] =", gamma[i])
 #print(f"ringRadius[{i}] =", ringRadius[i])
