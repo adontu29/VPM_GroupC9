@@ -115,6 +115,9 @@ saffmanVelocity = np.ones(len(timeStamps))
 ringPos = []
 gamma = np.ones(len(timeStamps))
 
+ttab = []
+rtab = []
+
 for i in range(len(timeStamps)):
     zeros = ['', '0', '00', '000', '0000']
     # Debugged: Use zfill(4) instead of manual padding
@@ -124,6 +127,7 @@ for i in range(len(timeStamps)):
     # Debugged: Ensure correct file path format
     filename = f'../dataset/Vortex_Ring_DNS_Re7500_{stringtime}.vtp'
 
+
     try:
         X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance(filename)
     except FileNotFoundError:
@@ -132,6 +136,11 @@ for i in range(len(timeStamps)):
 
     # Debugged: Properly unpack ring position
     ringRadius[i], ringPos0 = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
+    vtrInstance = VortexRingInstance(X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t)
+    maxr = max(vtrInstance.rad)
+    minr = min(vtrInstance.rad)
+    minx = min(vtrInstance.x)
+    maxx = max(vtrInstance.x)
 
     # Debugged: Ensure `Viscosity` is accessed correctly
     if np.ndim(Viscosity) == 1:
@@ -139,47 +148,27 @@ for i in range(len(timeStamps)):
     else:
         nu[i] = Viscosity[1][0]
 
+    ttab.append(stringtime*1000)
+    rtab.append(findRad(vtrInstance,minr,maxr))
+
     # Debugged: Convert ringPos to array for safer indexing
     ringPos.append(np.array(ringPos0))
 
     # Debugged: Ensure `gamma[i]` is properly computed
     strengthMagnitude = np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2)
     gamma[i] = np.sum(strengthMagnitude)
-
+    #print(findRad(vtrInstance,minr,maxr))
 # Debugged: Ensure ringPos is properly structured
 ringPos = np.array(ringPos)
 
-x, y, z, u, v, w, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance(
-    "Vortex_Ring_DNS_Re7500_0025.vtp")
+#plotting
+plt.plot(ttab,rtab)
 
-vtrInstance = VortexRingInstance(x, y, z, u, v, w, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t)
-
-# find min and max coordinates of the particles along the x axis
-minx = min(vtrInstance.x)
-maxx = max(vtrInstance.x)
-
-
-# bisection algorithm to find ring core's position along the x-axis, inputs: VortexRingInstance object, min and max x-coordinates, output: x-coordinate of vortex ring core
-
-
-# find minimum and maximum radii
-maxr = max(vtrInstance.rad)
-minr = min(vtrInstance.rad)
-
-
-# bisection algorithm to find radius of ring core, inputs: VortexRingInstance object, minimum and maximum radius, output: radius of vortex ring core
-
-
-
-fig = plt.figure()
-ax = plt.axes()
-numVel = ax.plot(timeStamps, Velocity, 'b-')
-safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
 
 plt.show()
 
-print(f"gamma[{i}] =", gamma[i])
-print(f"ringRadius[{i}] =", ringRadius[i])
-print(f"nu[{i}] =", nu[i])
-print(f"timeStamps[{i}] =", timeStamps[i] / 1000)
-print(f"saffmanVelocity[{i}] =", saffmanVelocity[i])
+#print(f"gamma[{i}] =", gamma[i])
+#print(f"ringRadius[{i}] =", ringRadius[i])
+#print(f"nu[{i}] =", nu[i])
+#print(f"timeStamps[{i}] =", timeStamps[i] / 1000)
+#print(f"saffmanVelocity[{i}] =", saffmanVelocity[i])
