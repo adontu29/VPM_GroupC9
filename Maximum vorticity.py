@@ -1,13 +1,8 @@
 #import the needed modules
 import numpy as np
-import pandas as pd
-import scipy as sp
-import ReadData as rd
-import math as m
+from Test import ReadData as rd
 from matplotlib import pyplot as plt
-import matplotlib.animation as animation
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
+
 
 def RadiusVelocityPlotsFromMaxVorticity():
 

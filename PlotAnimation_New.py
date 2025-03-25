@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D  # Needed for 3D plotting
-import ReadData as rd
+import ReadData2 as rd
 
 # === Configuration ===
 DATA_PATH = "dataset"
