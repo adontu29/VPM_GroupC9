@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import ReadData as rd
+import ReadData2 as rd
 import math as m
 
 # === Helper Function ===
