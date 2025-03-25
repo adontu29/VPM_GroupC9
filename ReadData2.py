@@ -87,5 +87,3 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
     VortexRingPosition = [X_avg, Y_avg, Z_avg]
 
     return Radius_avg, VortexRingPosition
-
-print(f"Kinematic viscosity ν = {particle_viscosity0:.6f} m²/s")
