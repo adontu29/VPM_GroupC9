@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 import ReadData as rd
 import matplotlib.animation as animation
 
+from pathlib import Path
+two_up = Path(__file__).resolve().parents[1]
+print(two_up)
+
 def calcDist (instance1, instance2):
     return  m.sqrt((instance1[0] - instance2[0])**2 + (instance1[1] - instance2[1])**2 + (instance1[2] - instance2[2])**2)
 
@@ -50,6 +54,7 @@ for i in range(len(timeStamps)):
     strengthMagnitude = np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2)
     gamma[i] = np.sum(strengthMagnitude)
     ringStrength[i] = rd.getRingStrength(X, Y, Z, Wx, Wy, Wz, ringPos[i], Radius[1][0], ringCoreRadius[i])
+    print(ringStrength[i])
 # Debugged: Ensure ringPos is properly structured
 ringPos = np.array(ringPos)
 
@@ -84,10 +89,7 @@ ringStrength = ax.plot(timeStamps/1000, ringStrength, 'b-')
 
 plt.show()
 
-
 print(f"gamma[{i}] =", gamma[i])
-print(f"ringRadius[{i}] =", ringRadius[i])
 print(f"nu[{i}] =", nu[i])
 print(f"timeStamps[{i}] =", timeStamps[i] / 1000)
 print(f"saffmanVelocity[{i}] =", saffmanVelocity[i])
-
