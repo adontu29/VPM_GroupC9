@@ -90,3 +90,4 @@ print(f"ringRadius[{i}] =", ringRadius[i])
 print(f"nu[{i}] =", nu[i])
 print(f"timeStamps[{i}] =", timeStamps[i] / 1000)
 print(f"saffmanVelocity[{i}] =", saffmanVelocity[i])
+
