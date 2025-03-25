@@ -1,11 +1,5 @@
-import vtk
 import numpy as np
-import math as m
 import matplotlib.pyplot as plt
-import ReadData as rd
-import matplotlib.animation as animation
-from mpl_toolkits.mplot3d import Axes3D
-from PlotAnimation import update
 
 # Define the dataset time range
 timeStamps = np.arange(25, 1575, 25)
