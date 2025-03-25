@@ -82,6 +82,7 @@ fig4 = plt.figure(4)
 ax = plt.axes()
 ringStrength = ax.plot(timeStamps/1000, ringStrength, 'b-')
 
+
 plt.show()
 
 
