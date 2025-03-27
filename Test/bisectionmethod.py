@@ -12,7 +12,7 @@ def calcDist (instance1, instance2):
 
 #load an instance of the dataset and create a VortexRingInstance object for it
 x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = rd.readVortexRingInstance(
-    "Vortex_Ring_DNS_Re7500_0025.vtp")
+    "../dataset/Vortex_Ring_DNS_Re7500_0025.vtp")
 
 print(sys.path)
 vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
@@ -118,6 +118,7 @@ gamma = np.ones(len(timeStamps))
 ttab = []
 rtab = []
 xtab = []
+vtab = []
 
 for i in range(len(timeStamps)):
     zeros = ['', '0', '00', '000', '0000']
@@ -155,7 +156,10 @@ for i in range(len(timeStamps)):
     ttab.append(float(stringtime)/1000)
     rtab.append(findRad(vtrInstance,minr,maxr))
     xtab.append(findXPlane(vtrInstance,minx,maxx))
+    #vtab.append()
 
+    for i in range(len(ttab)-1):
+        vtab.append((xtab[i+1]-xtab[i])/0.025)
 
     # Debugged: Convert ringPos to array for safer indexing
     ringPos.append(np.array(ringPos0))
@@ -163,13 +167,14 @@ for i in range(len(timeStamps)):
     # Debugged: Ensure `gamma[i]` is properly computed
     strengthMagnitude = np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2)
     gamma[i] = np.sum(strengthMagnitude)
+    print(stringtime)
     #print(findRad(vtrInstance,minr,maxr))
 # Debugged: Ensure ringPos is properly structured
 ringPos = np.array(ringPos)
 
 #plotting
 #plt.plot(ttab,rtab)
-plt.plot(ttab,xtab)
+plt.plot(ttab,vtab)
 
 plt.show()
 
