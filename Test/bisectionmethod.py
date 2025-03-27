@@ -48,7 +48,7 @@ def findXPlane(vtrInstance, minx, maxx):
             vort2 = vort2 + absvort
             numpart2 = numpart2 + 1
     
-    #if both halfs of domain still contain particles, calculate average vorticities, use domain half with higher avg vorticity and repeat algorithm
+#if both halfs of domain still contain particles, calculate average vorticities, use domain half with higher avg vorticity and repeat algorithm
     if numpart1 != 0 and numpart2 != 0 and vort1 != 0 and vort2 != 0:
         vort1avg = vort1 / numpart1
         vort2avg = vort2 / numpart2
@@ -56,7 +56,7 @@ def findXPlane(vtrInstance, minx, maxx):
         if vort1avg > vort2avg:
             return findXPlane(vtrInstance, minx, middle)
         else:
-             return findXPlane(vtrInstance, middle, maxx)
+            return findXPlane(vtrInstance, middle, maxx)
 
     else:
         return middle
