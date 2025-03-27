@@ -3,16 +3,15 @@ import math as m
 
 
 
-def LinearImpuls(CirculationArray, ViscousityArea):
+def LinearImpulse(CirculationArray, ViscousityArea):
 
     TimeStamps = np.arange(0,1575,25) / 1000
     LArray = (2*np.array(ViscousityArea)*TimeStamps)**0.5
     theta = 1 / LArray
-    R0 = 1
 
     gamma0_array = np.array(CirculationArray) / (1 - np.exp(-(theta**2) / 2))
 
-
+    R0 = 1
     Impulses = m.pi * gamma0_array * (R0**2)  
     
     return Impulses 
