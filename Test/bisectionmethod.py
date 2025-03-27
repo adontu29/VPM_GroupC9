@@ -12,7 +12,7 @@ def calcDist (instance1, instance2):
 
 #load an instance of the dataset and create a VortexRingInstance object for it
 x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = rd.readVortexRingInstance(
-    "Vortex_Ring_DNS_Re7500_0025.vtp")
+    "../dataset/Vortex_Ring_DNS_Re7500_0025.vtp")
 
 print(sys.path)
 vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
@@ -48,7 +48,7 @@ def findXPlane(vtrInstance, minx, maxx):
             vort2 = vort2 + absvort
             numpart2 = numpart2 + 1
     
-    #if both halfs of domain still contain particles, calculate average vorticities, use domain half with higher avg vorticity and repeat algorithm
+#if both halfs of domain still contain particles, calculate average vorticities, use domain half with higher avg vorticity and repeat algorithm
     if numpart1 != 0 and numpart2 != 0 and vort1 != 0 and vort2 != 0:
         vort1avg = vort1 / numpart1
         vort2avg = vort2 / numpart2
@@ -56,7 +56,7 @@ def findXPlane(vtrInstance, minx, maxx):
         if vort1avg > vort2avg:
             return findXPlane(vtrInstance, minx, middle)
         else:
-             return findXPlane(vtrInstance, middle, maxx)
+            return findXPlane(vtrInstance, middle, maxx)
 
     else:
         return middle
