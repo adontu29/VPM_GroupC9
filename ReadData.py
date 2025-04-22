@@ -81,7 +81,7 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
         Y_avg += Y[i] * weight
         Z_avg += Z[i] * weight
         Radius_avg += PositionVector[i] * weight
-
+    # Radius_avg = np.sqrt(X_avg**2+Z_avg**2)
     X_avg /= Strength_total
     Y_avg /= Strength_total
     Z_avg /= Strength_total
