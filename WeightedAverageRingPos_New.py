@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import ReadData2 as rd
 import math as m
+import MaximumVorticity as mv
 
 # === Helper Function ===
 def calc_dist(p1, p2):
@@ -60,10 +61,14 @@ for i in range(1, n_frames):
     saffman_velocity[i] = (gamma[i] / (4 * np.pi * ring_radius[i])) * (
         np.log(4 * ring_radius[i] / core_size) - 0.558 - (3.6716 * nu[i] * time_sec[i] / (ring_radius[i]**2))
     )
-
+# === Compute Velocity From MAX Vorticity ===
+ring_radius_mv, ring_pos_mv, velocity_mv, time_stamps_mv = mv.RadiusVelocityPlotsFromMaxVorticity()
+a,b,c = mv.regressionM(time_stamps_mv, velocity_mv, 2)
 # === Plotting ===
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.plot(time_stamps, velocity, 'b-', label='Numerical Velocity')
+ax.plot(time_stamps_mv, velocity_mv, 'g-', label='Numerical Velocity (Max vorticity)')
+ax.plot(time_stamps_mv, mv.function(time_stamps_mv,a,b,c), 'g--', label='Numerical Velocity (Max vorticity)(regression)')
 ax.plot(time_stamps[1:], saffman_velocity[1:], 'r--', label='Saffman Velocity')
 ax.set_xlabel("Time [ms]")
 ax.set_ylabel("Velocity [m/s]")

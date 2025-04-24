@@ -1,6 +1,6 @@
 #import the needed modules
 import numpy as np
-from Test import ReadData as rd
+import ReadData as rd
 from matplotlib import pyplot as plt
 
 
@@ -22,7 +22,7 @@ def RadiusVelocityPlotsFromMaxVorticity():
     X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
     
     # defines the timestamps and sets the length of the velocity array
-    timeStampMultiplyer = 1
+    timeStampMultiplyer = 2
     timeStamps = np.arange(25*timeStampMultiplyer,1575,25*timeStampMultiplyer)
     Velocity = np.ones(len(timeStamps))
 
