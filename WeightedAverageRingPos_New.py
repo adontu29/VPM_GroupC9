@@ -63,12 +63,12 @@ for i in range(1, n_frames):
     )
 # === Compute Velocity From MAX Vorticity ===
 ring_radius_mv, ring_pos_mv, velocity_mv, time_stamps_mv = mv.RadiusVelocityPlotsFromMaxVorticity()
-a,b,c = mv.regressionM(time_stamps_mv, velocity_mv, 2)
+a,b,c,d,e,f = mv.regressionM(time_stamps_mv, velocity_mv, 5)
 # === Plotting ===
 fig, ax = plt.subplots(figsize=(8, 5))
 ax.plot(time_stamps, velocity, 'b-', label='Numerical Velocity')
 ax.plot(time_stamps_mv, velocity_mv, 'g-', label='Numerical Velocity (Max vorticity)')
-ax.plot(time_stamps_mv, mv.function(time_stamps_mv,a,b,c), 'g--', label='Numerical Velocity (Max vorticity)(regression)')
+ax.plot(time_stamps_mv, mv.function(time_stamps_mv,a,b,c,d,e,f), 'g--', label='Numerical Velocity (Max vorticity)(regression)')
 ax.plot(time_stamps[1:], saffman_velocity[1:], 'r--', label='Saffman Velocity')
 ax.set_xlabel("Time [ms]")
 ax.set_ylabel("Velocity [m/s]")
