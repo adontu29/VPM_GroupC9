@@ -1,11 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import ReadData as rd
+import Test.ReadData as rd
 import math
 from vtriClass import VortexRingInstance
+import vtk
+
+def calcDist (instance1, instance2):
+    return math.sqrt((instance1[0] - instance2[0])**2 + (instance1[1] - instance2[1])**2 + (instance1[2] - instance2[2])**2)
+
 
 #load an instance of the dataset and create a VortexRingInstance object for it
-x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = rd.readVortexRingInstance("dataset\Vortex_Ring_DNS_Re7500_0025.vtp")
+x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = rd.readVortexRingInstance(
+    "../dataset/Vortex_Ring_DNS_Re7500_0025.vtp")
 vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
 
 #find min and max coordinates of the particles along the x axis
@@ -96,5 +102,22 @@ def findRad(vtrInstance, minr, maxr):
 
     else:
         return middle
-
+#print(findRad(vtrInstance, minr, maxr))
 #todo: plot core radius over time using this function
+timeStamps = np.arange(0,1575,25)
+Velocity = np.ones(len(timeStamps))
+ringRadius = np.ones(len(timeStamps))
+nu = np.ones(len(timeStamps))
+saffmanVelocity = np.ones(len(timeStamps))
+ringPos = []
+gamma = np.ones(len(timeStamps))
+
+for i in range(len(timeStamps)):
+    zeros = ['', '0', '00', '000', '0000']
+    # Debugged: Use zfill(4) instead of manual padding
+    stringtime = str(timeStamps[i]).zfill(4)
+    #print(stringtime, zeros[4-len(stringtime)])
+
+    # Debugged: Ensure correct file path format
+
+print(stringtime)

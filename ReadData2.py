@@ -87,4 +87,3 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
     VortexRingPosition = [X_avg, Y_avg, Z_avg]
 
     return Radius_avg, VortexRingPosition
-
