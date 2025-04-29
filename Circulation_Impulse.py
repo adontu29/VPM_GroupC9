@@ -3,26 +3,35 @@ import math as m
 
 
 
+
 #===Linear Impuls===
 
-def compute_linear_impulse(positionis, circulations):
-    """
-    Compute the linear impulse at a given time step.
+#This function should be used for one time frame
+#
 
-    Inputs:
-    - positions: (N, M) numpy array of particle positions (x, y, z) at time t
-    - circulations: (N, M) numpy array of vortex strengths (Gamma_x, Gamma_y, Gamma_z) at time t
+def compute_linear_impulse(X, Y, Z, Wx, Wy, Wz):
+    
+    positions = np.stack((X, Y, Z), axis=1)     
+    strengths = np.stack((Wx, Wy, Wz), axis=1)
+    
+    impulses = np.cross(positions, strengths)
 
-    Returns:
-    -impulse: (X, Y) numpy array representing the linear impulse vector at time t
-    """
+    linear_impulse = 0.5 * np.sum(impulses, axis=0)
 
-    cross_products = np.cross(positions, circulations)
+    return linear_impulse
 
-    impulse = 0.5 * np.sum(cross_products, axis=0)
 
-    return impulse
+def compute_angular_impulse(X, Y, Z, Wx, Wy, Wz):
+    
+    positions = np.stack((X, Y, Z), axis=1)     
+    strengths = np.stack((Wx, Wy, Wz), axis=1)
 
+    inner_cross = np.cross(positions, strengths)
+    outer_cross = np.cross(positions, inner_cross)
+
+    angular_impulse = (1/3) * np.sum(outer_cross, axis=0)
+
+    return angular_impulse
 
 
 #===Linear Impulse function, For the comparison====
