@@ -17,6 +17,7 @@ particle_viscosity0 = ring_strength0 / Re  # m²/s, kinematic viscosity
 time_step_size0 = 5 * particle_distance0 ** 2 / ring_strength0  # s
 n_time_steps0 = int(20 * ring_radius0 ** 2 / ring_strength0 / time_step_size0)
 
+
 # Read the VTP file
 
 def readVortexRingInstance(filename):
@@ -40,7 +41,6 @@ def readVortexRingInstance(filename):
     Y = points[:, 1]
     Z = points[:, 2]
 
-
     U = point_data['Velocity'][:, 0]
     V = point_data['Velocity'][:, 1]
     W = point_data['Velocity'][:, 2]
@@ -54,7 +54,7 @@ def readVortexRingInstance(filename):
     Viscosity = point_data['Viscosity']
     Viscosity_t = point_data['Viscosity_t']
 
-    return [X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t]
+    return [X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t]
 
 
 def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
@@ -87,3 +87,22 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
     VortexRingPosition = [X_avg, Y_avg, Z_avg]
 
     return Radius_avg, VortexRingPosition
+
+
+def compute_ring_trajectory(filenames, particle_radius, core_radius, dt):
+    positions = []
+
+    for file in filenames:
+        X, Y, Z, U, V, W, Wx, Wy, Wz, *_ = readVortexRingInstance(file)
+
+        # Get ring position
+        _, pos = getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
+        positions.append(pos)
+
+    positions = np.array(positions)
+
+    velocities = np.gradient(positions, dt, axis=0)  # shape (T, 3)
+
+    accelerations = np.gradient(velocities, dt, axis=0)  # shape (T, 3)
+
+    return positions, velocities, accelerations
