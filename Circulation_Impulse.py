@@ -16,9 +16,9 @@ def compute_linear_impulse(X, Y, Z, Wx, Wy, Wz):
     
     impulses = np.cross(positions, strengths)
 
-    lenair_impulse = 0.5 * np.sum(impulses, axis=0)
+    linear_impulse = 0.5 * np.sum(impulses, axis=0)
 
-    return lenair_impulse
+    return linear_impulse
 
 
 def compute_angular_impulse(X, Y, Z, Wx, Wy, Wz):
