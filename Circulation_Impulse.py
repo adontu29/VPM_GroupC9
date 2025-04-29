@@ -3,22 +3,36 @@ import math as m
 
 
 
+
 #===Linear Impuls===
 
+#This function should be used for one time frame
+#
+
+def compute_linear_impulse(X, Y, Z, Wx, Wy, Wz):
+    
+    positions = np.stack((X, Y, Z), axis=1)     
+    strengths = np.stack((Wx, Wy, Wz), axis=1)
+    
+    impulses = np.cross(positions, strengths)
+
+    lenair_impulse = 0.5 * np.sum(impulses, axis=0)
 
 
+    return lenair_impulse
 
 
+def compute_angulair_impulse(X, Y, Z, Wx, Wy, Wz):
+    
+    positions = np.stack((X, Y, Z), axis=1)     
+    strengths = np.stack((Wx, Wy, Wz), axis=1)
 
+    inner_cross = np.cross(positions, strengths)
+    outer_cross = np.cross(positions, inner_cross)
 
+    angular_impulse = (1/3) * np.sum(outer_cross, axis=0)
 
-
-
-
-
-
-
-
+    return angular_impulse
 
 
 #===Linear Impulse function, For the comparison====
