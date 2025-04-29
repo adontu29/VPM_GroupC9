@@ -8,9 +8,7 @@ def calcDist (instance1, instance2):
     return  m.sqrt((instance1[0] - instance2[0])**2 + (instance1[1] - instance2[1])**2 + (instance1[2] - instance2[2])**2)
 
 
-saffmanPos = []
-saffmanPosPlot = []
-dt = 25E-3
+
 timeStamps = np.arange(0,1575,25)
 Velocity = np.ones(len(timeStamps))
 ringRadius = np.ones(len(timeStamps))
@@ -63,56 +61,33 @@ for i in range(len(timeStamps)):
         Velocity[i] = calcDist(ringPos[i+1],ringPos[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000
     if (i!=0):
         eps = 1e-8
-        saffmanVelocity[i] = (gamma[i]/(4*np.pi*ringRadius[i]))*(np.log(4*ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]/1000) + eps)) -0.558 - 3.6716 * nu[i] * timeStamps[i]/1000 / (ringRadius[i] ** 2))
-        saffmanPos.append((saffmanVelocity[i]+saffmanVelocity[i-1])/2 * dt)
-        saffmanPosPlot.append(sum(saffmanPos))
-SaffmanPosInt = sum(saffmanPos)
-Error = (SaffmanPosInt - ringPos[-1][0])/SaffmanPosInt
+        saffmanVelocity[i] = (ringStrength[i]/(4*np.pi*ringRadius[i]))*(np.log(4*ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]/1000) + eps)) -0.558 - 3.6716 * nu[i] * timeStamps[i]/1000 / (ringRadius[i] ** 2))
 
 
 fig1 = plt.figure(1)
 ax = plt.axes()
 numVel = ax.plot(timeStamps/1000, Velocity, 'b-')
 safVel = ax.plot(timeStamps[1:len(timeStamps)-1]/1000, saffmanVelocity[1:len(timeStamps)-1], 'r-')
-plt.title('Velocity')
 
 fig2 = plt.figure(2)
 ax = plt.axes()
 coreRad = ax.plot(timeStamps/1000, ringCoreRadius, 'b-')
-plt.title('Ring Core Radius')
 
 fig3 = plt.figure(3)
 ax = plt.axes()
 ringRadius = ax.plot(timeStamps/1000, ringRadius, 'b-')
-plt.title('Ring Radius')
 
 fig4 = plt.figure(4)
 ax = plt.axes()
 ringStrength = ax.plot(timeStamps/1000, ringStrength, 'b-')
-plt.title('Circulation')
 
-# numVel = ax.plot(timeStamps, Velocity, 'b-')
-# safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
-
-fig5 = plt.figure(5)
-plt.subplot(121)
-plt.plot(timeStamps[1:], saffmanPosPlot, 'k-')
-plt.plot(timeStamps,ringPos, 'k--')
-plt.title('Position')
-
-plt.subplot(122)
-Energy = 0.5 * Velocity ** 2
-plt.plot(timeStamps, Energy, 'k-')
-plt.scatter(timeStamps, Energy, c="red", edgecolors='black')
-plt.title('Kinetic Energy')
 
 plt.show()
 
+
 print(f"gamma[{i}] =", gamma[i])
+print(f"ringRadius[{i}] =", ringRadius[i])
 print(f"nu[{i}] =", nu[i])
 print(f"timeStamps[{i}] =", timeStamps[i] / 1000)
 print(f"saffmanVelocity[{i}] =", saffmanVelocity[i])
-print(Error)
-print(SaffmanPosInt)
-print(ringPos[-1][0])
-# Creating the Animation object
+
