@@ -77,9 +77,29 @@ for i, time in enumerate(timeStamps):
 
 # Compute velocity using NumPy diff
 vtab = np.diff(xtab) / 0.025
+def regressionM(X, y, M):
+    coeffs = np.polyfit(X, y, M)
+    return(coeffs)
+
+def function(X, a, b, c):
+    X = np.array(X)
+    y = a * X ** 2 + b * X + c
+    return y
+
+coeffs = regressionM(ttab[:-1], vtab, 2)
+a, b, c = coeffs
+
+fig = plt.figure()
+ax = plt.axes()
+
+#line, = ax.plot(timeStamps, Velocity, 'b-')
+line, = ax.plot(ttab[:-1], function(ttab[:-1],a,b,c), 'r-')
+
 
 # Plot results
 plt.plot(ttab[:-1], vtab)  # Adjust x-axis to match vtab length
 plt.xlabel("Time (s)")
 plt.ylabel("Velocity")
+#plt.ylabel("Radius")
+#plt.ylabel("x-position")
 plt.show()

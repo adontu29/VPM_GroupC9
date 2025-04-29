@@ -1,6 +1,6 @@
 #import the needed modules
 import numpy as np
-from Test import ReadData as rd
+import ReadData as rd
 from matplotlib import pyplot as plt
 
 
@@ -22,7 +22,7 @@ def RadiusVelocityPlotsFromMaxVorticity():
     X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
     
     # defines the timestamps and sets the length of the velocity array
-    timeStampMultiplyer = 1
+    timeStampMultiplyer = 2
     timeStamps = np.arange(25*timeStampMultiplyer,1575,25*timeStampMultiplyer)
     Velocity = np.ones(len(timeStamps))
 
@@ -80,17 +80,17 @@ def regressionM(X, y, M):
     coeffs = np.polyfit(X, y, M)
     return(coeffs)
 
-def function(X, a, b, c):
-    y = a * X ** 2 + b * X + c
+def function(X, a, b, c, d, e, f):
+    y = a * X ** 5 + b * X ** 4 + c * X ** 3 + d * X ** 2 + e * X + f
     return y
 
-coeffs = regressionM(timeStamps, Velocity, 2)
-a, b, c = coeffs
+coeffs = regressionM(timeStamps, Velocity, 5)
+a, b, c, d, e, f = coeffs
 
 fig = plt.figure()
 ax = plt.axes()
 
 line, = ax.plot(timeStamps, Velocity, 'b-')
-line, = ax.plot(timeStamps, function(timeStamps,a,b,c), 'r-')
+line, = ax.plot(timeStamps, function(timeStamps,a,b,c,d,e,f), 'r-')
 
 plt.show()
