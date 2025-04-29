@@ -119,7 +119,7 @@ def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
 def calculateRingCirculation(X,Y,Z,Wx,Wy,Wz,RingPos,Treshold):
     i = 0
     X_inplane, Y_inplane, Z_inplane = [], [], []
-    Wx_inplane, Wy_inplane, Wz_inplane = []
+    Wx_inplane, Wy_inplane, Wz_inplane = [], [], []
     while i < len(X):
         if abs(X[i]) < Treshold:
             X_inplane.append(X[i])
