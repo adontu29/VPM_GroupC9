@@ -97,7 +97,7 @@ def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos):
     X = X[Strength_magnitude > maxStrength * Threshold] - RingPos[0]
     Y = Y[Strength_magnitude > maxStrength * Threshold] - RingPos[1]
     Z = Z[Strength_magnitude > maxStrength * Threshold] - RingPos[2]
-    Radius = np.sqrt(np.square(X) + np.square(Y) + np.square(Z))
+    Radius = np.sqrt(np.square(Y) + np.square(Z))
     coreRadiusZ = (np.max(np.abs(Z)) - np.min(np.abs(Z)))/2
     coreRadiusR = (np.max(Radius) - np.min(Radius))/2
     return coreRadiusR
@@ -114,3 +114,4 @@ def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
     ringStrength = vorticityMagnitude*(np.exp(radialDistance**2/(coreRadius*2)**2))*(np.pi*(coreRadius*2)**2)
 
     return np.mean(ringStrength)
+def calculateRingCirculation(X,Y,Z,Wx,Wy,Wz,RingPos):
