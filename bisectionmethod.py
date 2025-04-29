@@ -2,10 +2,10 @@ import sys
 
 import numpy as np
 import matplotlib.pyplot as plt
-import ReadData as rd
+from Test import ReadData as rd
 import math
 from vtriClass import VortexRingInstance
-import vtk
+
 
 def calcDist (instance1, instance2):
     return math.sqrt((instance1[0] - instance2[0])**2 + (instance1[1] - instance2[1])**2 + (instance1[2] - instance2[2])**2)

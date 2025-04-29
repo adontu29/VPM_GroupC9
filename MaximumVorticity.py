@@ -1,6 +1,6 @@
 #import the needed modules
 import numpy as np
-import ReadData as rd
+from Test import ReadData as rd
 from matplotlib import pyplot as plt
 
 
