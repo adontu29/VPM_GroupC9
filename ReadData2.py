@@ -105,3 +105,8 @@ def compute_ring_trajectory(filenames, particle_radius, core_radius, dt):
     accelerations = np.gradient(velocities, dt, axis=0)  # shape (T, 3)
 
     return positions, velocities, accelerations
+
+np.savez("vortex_motion_data.npz",
+         positions=positions,
+         velocities=velocities,
+         accelerations=accelerations)

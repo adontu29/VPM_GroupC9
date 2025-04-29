@@ -1,7 +1,10 @@
 import numpy as np
 import math as m
 
-
+data = np.load("vortex_motion_data.npz")
+positions = data["positions"]
+velocities = data["velocities"]
+accelerations = data["accelerations"]
 
 #===Linear Impuls===
 
