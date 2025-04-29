@@ -91,8 +91,8 @@ ax = plt.axes()
 ringStrength = ax.plot(timeStamps/1000, ringStrength, 'b-')
 plt.title('Circulation')
 
-numVel = ax.plot(timeStamps, Velocity, 'b-')
-safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
+# numVel = ax.plot(timeStamps, Velocity, 'b-')
+# safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
 
 fig5 = plt.figure(5)
 plt.subplot(121)
