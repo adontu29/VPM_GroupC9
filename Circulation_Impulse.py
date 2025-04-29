@@ -10,11 +10,11 @@ def compute_linear_impulse(positionis, circulations):
     Compute the linear impulse at a given time step.
 
     Inputs:
-    - positions: (N, 3) numpy array of particle positions (x, y, z) at time t
-    - circulations: (N, 3) numpy array of vortex strengths (Gamma_x, Gamma_y, Gamma_z) at time t
+    - positions: (N, M) numpy array of particle positions (x, y, z) at time t
+    - circulations: (N, M) numpy array of vortex strengths (Gamma_x, Gamma_y, Gamma_z) at time t
 
     Returns:
-    -impulse: (3, ) numpy array representing the linear impulse vector at time t
+    -impulse: (X, Y) numpy array representing the linear impulse vector at time t
     """
 
     cross_products = np.cross(positions, circulations)
