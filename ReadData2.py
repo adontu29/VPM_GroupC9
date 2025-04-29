@@ -87,3 +87,21 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
     VortexRingPosition = [X_avg, Y_avg, Z_avg]
 
     return Radius_avg, VortexRingPosition
+
+def compute_ring_trajectory(filenames, particle_radius, core_radius, dt):
+    positions = []
+
+    for file in filenames:
+        X, Y, Z, U, V, W, Wx, Wy, Wz, *_ = readVortexRingInstance(file)
+
+        # Get ring position
+        _, pos = getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
+        positions.append(pos)
+
+    positions = np.array(positions)
+
+    velocities = np.gradient(positions, dt, axis=0)  # shape (T, 3)
+
+    accelerations = np.gradient(velocities, dt, axis=0)  # shape (T, 3)
+
+    return positions, velocities, accelerations
