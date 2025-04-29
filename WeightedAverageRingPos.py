@@ -63,22 +63,22 @@ for i in range(len(timeStamps)):
         saffmanVelocity[i] = (ringStrength[i]/(4*np.pi*ringRadius[i]))*(np.log(4*ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]/1000) + eps)) -0.558 - 3.6716 * nu[i] * timeStamps[i]/1000 / (ringRadius[i] ** 2))
 
 
-# fig1 = plt.figure(1)
-# ax = plt.axes()
-# numVel = ax.plot(timeStamps/1000, Velocity, 'b-')
-# safVel = ax.plot(timeStamps[1:len(timeStamps)-1]/1000, saffmanVelocity[1:len(timeStamps)-1], 'r-')
-#
-# fig2 = plt.figure(2)
-# ax = plt.axes()
-# coreRad = ax.plot(timeStamps/1000, ringCoreRadius, 'b-')
-#
-# fig3 = plt.figure(3)
-# ax = plt.axes()
-# ringRadius = ax.plot(timeStamps/1000, ringRadius, 'b-')
-#
-# fig4 = plt.figure(4)
-# ax = plt.axes()
-# ringStrength = ax.plot(timeStamps/1000, ringStrength, 'b-')
+fig1 = plt.figure(1)
+ax = plt.axes()
+numVel = ax.plot(timeStamps/1000, Velocity, 'b-')
+safVel = ax.plot(timeStamps[1:len(timeStamps)-1]/1000, saffmanVelocity[1:len(timeStamps)-1], 'r-')
+
+fig2 = plt.figure(2)
+ax = plt.axes()
+coreRad = ax.plot(timeStamps/1000, ringCoreRadius, 'b-')
+
+fig3 = plt.figure(3)
+ax = plt.axes()
+ringRadius = ax.plot(timeStamps/1000, ringRadius, 'b-')
+
+fig4 = plt.figure(4)
+ax = plt.axes()
+ringStrength = ax.plot(timeStamps/1000, ringStrength, 'b-')
 
 
 plt.show()

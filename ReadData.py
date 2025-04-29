@@ -131,4 +131,7 @@ def calculateRingCirculation(X,Y,Z,Wx,Wy,Wz,RingPos,Treshold):
             i += 1
         else :
             i += 1
+
+
     return X_inplane, Wx_inplane, Y_inplane, Wy_inplane, Z_inplane, Wz_inplane
+
