@@ -18,11 +18,10 @@ def compute_linear_impulse(X, Y, Z, Wx, Wy, Wz):
 
     lenair_impulse = 0.5 * np.sum(impulses, axis=0)
 
-
     return lenair_impulse
 
 
-def compute_angulair_impulse(X, Y, Z, Wx, Wy, Wz):
+def compute_angular_impulse(X, Y, Z, Wx, Wy, Wz):
     
     positions = np.stack((X, Y, Z), axis=1)     
     strengths = np.stack((Wx, Wy, Wz), axis=1)
