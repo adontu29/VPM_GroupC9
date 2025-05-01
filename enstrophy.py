@@ -1,6 +1,7 @@
 import numpy as np
 import ReadData as rd
 from vtriClass import VortexRingInstance
+import matplotlib.pyplot as plt
 
 """def calcEnstrophy(ringInstance):
     summing = 0
@@ -49,10 +50,24 @@ def calcEnstrophy_vec(ringInstance):
 
     return np.sum(summand) / (4 * np.pi)
 
+DATA_PATH = "dataset"
+FILENAME_TEMPLATE = "Vortex_Ring_DNS_Re7500_{:04d}.vtp"
+#TIMESTAMPS = np.arange(25, 1575, 25)  # in steps of 25
+TIMESTAMPS = np.arange(25, 500, 25)
 
-x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = rd.readVortexRingInstance(
-    "dataset/Vortex_Ring_DNS_Re7500_0025.vtp")
+enstrophies = []
+times = []
 
-vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
-        
-print(calcEnstrophy_vec(vtrInstance))
+for stamp in TIMESTAMPS:
+    print(stamp)
+    filename = f"{DATA_PATH}/{FILENAME_TEMPLATE.format(stamp)}"
+    x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t = rd.readVortexRingInstance(filename)
+
+    vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
+
+    times.append(stamp)
+    enstrophies.append(calcEnstrophy_vec(vtrInstance))
+
+
+plt.plot(times, enstrophies)
+plt.show()
