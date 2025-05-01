@@ -5,6 +5,20 @@ from matplotlib import pyplot as plt
 
 
 def RadiusVelocityPlotsFromMaxVorticity():
+    ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
+    ring_radius     = 1.0               # m, radius of the vortex ring
+    ring_strength   = 1.0               # m²/s, vortex strength
+    ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
+
+
+    ### Particle Distribution Setup
+
+    Re = 7500                                   # Reynolds number
+    particle_distance  = 0.25*ring_thickness    # m
+    particle_radius    = 0.8*particle_distance**0.5  # m
+    particle_viscosity = ring_strength/Re       # m²/s, kinematic viscosity
+    time_step_size     = 5 * particle_distance**2/ring_strength  # s
+    n_time_steps       = int( 20*ring_radius**2 / ring_strength / time_step_size)
 
     # calculates the h value for numerical differentiation 
     def calcDist (instance1, instance2):
@@ -22,8 +36,9 @@ def RadiusVelocityPlotsFromMaxVorticity():
     X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0000.vtp')
     
     # defines the timestamps and sets the length of the velocity array
-    timeStampMultiplyer = 2
-    timeStamps = np.arange(25*timeStampMultiplyer,1575,25*timeStampMultiplyer)
+    timeStampMultiplyer = 1
+    timeStamps_names = np.arange(25*timeStampMultiplyer,1575,25*timeStampMultiplyer)
+    timeStamps = timeStamps_names * time_step_size
     Velocity = np.ones(len(timeStamps))
 
     # obtains the magnitude of the vorticity in the Y and Z direction, as the one in the X direction represents swirl
@@ -41,7 +56,7 @@ def RadiusVelocityPlotsFromMaxVorticity():
     for i in range(len(timeStamps)):
         # loops through the files
         zeros = ['', '0', '00', '000', '0000']
-        stringtime = str(timeStamps[i])
+        stringtime = str(timeStamps_names[i])
 
         # reads through the datafiles and extracts the relevant information
         X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_' + zeros[4-len(stringtime)] + stringtime + '.vtp')
@@ -64,11 +79,11 @@ def RadiusVelocityPlotsFromMaxVorticity():
     
     for i in range(len(timeStamps)):
             if (i==0):
-                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i])/(timeStamps[i+1]-timeStamps[i])*1000 # forward difference formula
+                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i])/(timeStamps[i+1]-timeStamps[i]) # forward difference formula
             elif (i==len(timeStamps)-1):
-                Velocity[i] = calcDist(ringPosLst[i],ringPosLst[i-1])/(timeStamps[i]-timeStamps[i-1])*1000 # backward difference formula
+                Velocity[i] = calcDist(ringPosLst[i],ringPosLst[i-1])/(timeStamps[i]-timeStamps[i-1]) # backward difference formula
             else:
-                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i-1])/(timeStamps[i+1]-timeStamps[i-1])*1000 # central difference formula
+                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i-1])/(timeStamps[i+1]-timeStamps[i-1]) # central difference formula
 
     return(ringRadiusLst,ringPosLst,Velocity,timeStamps)
 
