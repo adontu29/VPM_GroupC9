@@ -122,12 +122,12 @@ def calculateRingCirculation(X,Y,Z,Wx,Wy,Wz,RingPos,Treshold):
     Wx_inplane, Wy_inplane, Wz_inplane = [], [], []
     while i < len(X):
         if abs(X[i]) < Treshold:
-            X_inplane.append(X[i])
-            Wx_inplane.append(Wx[i])
-            Y_inplane.append(Y[i])
-            Wy_inplane.append(Wy[i])
-            Z_inplane.append(Z[i])
-            Wz_inplane.append(Wz[i])
+            X_inplane.append(abs(X[i]))
+            Wx_inplane.append(abs(Wx[i]))
+            Y_inplane.append(abs(Y[i]))
+            Wy_inplane.append(abs(Wy[i]))
+            Z_inplane.append(abs(Z[i]))
+            Wz_inplane.append(abs(Wz[i]))
             i += 1
         else :
             i += 1
