@@ -2,7 +2,7 @@ import sys
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Test import ReadData as rd
+import ReadData as rd
 import math
 from vtriClass import VortexRingInstance
 

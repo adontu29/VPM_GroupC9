@@ -1,10 +1,7 @@
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import Test.ReadData as rd
-import math
+import ReadData as rd
 from vtriClass import VortexRingInstance
-import vtk
 
 
 def calcDist(instance1, instance2):
