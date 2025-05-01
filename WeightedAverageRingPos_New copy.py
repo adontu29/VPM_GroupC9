@@ -56,7 +56,7 @@ for i in range(n_frames):
 # === Compute Saffman Velocity (skip first frame) ===
 eps = 1e-8
 time_sec = time_stamps / 1000
-for i in range(1, n_frames):
+for i in range(0, n_frames):
     core_size = np.sqrt(nu[i] * time_sec[i]) + eps
     saffman_velocity[i] = (gamma[i] / (4 * np.pi * ring_radius[i])) * (
         np.log(4 * ring_radius[i] / core_size) - 0.558 - (3.6716 * nu[i] * time_sec[i] / (ring_radius[i]**2))
