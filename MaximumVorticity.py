@@ -2,16 +2,20 @@
 import numpy as np
 import ReadData as rd
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+import numba
+from numba import jit
 
+degree = 3
 
 def RadiusVelocityPlotsFromMaxVorticity():
+# === Initial Conditions ===
+
     ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
     ring_radius     = 1.0               # m, radius of the vortex ring
     ring_strength   = 1.0               # m²/s, vortex strength
     ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
-
-
-    ### Particle Distribution Setup
 
     Re = 7500                                   # Reynolds number
     particle_distance  = 0.25*ring_thickness    # m
@@ -79,33 +83,37 @@ def RadiusVelocityPlotsFromMaxVorticity():
     
     for i in range(len(timeStamps)):
             if (i==0):
-                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i])/(timeStamps[i+1]-timeStamps[i]) # forward difference formula
+                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i])/(time_step_size*25) # forward difference formula
             elif (i==len(timeStamps)-1):
-                Velocity[i] = calcDist(ringPosLst[i],ringPosLst[i-1])/(timeStamps[i]-timeStamps[i-1]) # backward difference formula
+                Velocity[i] = calcDist(ringPosLst[i],ringPosLst[i-1])/(time_step_size*25) # backward difference formula
             else:
-                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i-1])/(timeStamps[i+1]-timeStamps[i-1]) # central difference formula
+                Velocity[i] = calcDist(ringPosLst[i+1],ringPosLst[i-1])/(time_step_size*50) # central difference formula
 
     return(ringRadiusLst,ringPosLst,Velocity,timeStamps)
+
+def regressionM(X, y, M):
+    X = np.array(X).reshape(-1, 1)
+    poly = PolynomialFeatures(degree=M)
+    X_poly = poly.fit_transform(X)
+    model = LinearRegression()
+    model.fit(X_poly, y)
+    return model, poly
 
 ringRadiusLst, ringPosLst, Velocity, timeStamps = RadiusVelocityPlotsFromMaxVorticity()
 print((ringPosLst))
 print(Velocity)
 
-def regressionM(X, y, M):
-    coeffs = np.polyfit(X, y, M)
-    return(coeffs)
+model, poly = regressionM(timeStamps, Velocity, degree)
 
-def function(X, a, b, c, d, e, f):
-    y = a * X ** 5 + b * X ** 4 + c * X ** 3 + d * X ** 2 + e * X + f
-    return y
+# Predict values using the model
+X_plot = np.array(timeStamps).reshape(-1, 1)
+X_poly_plot = poly.transform(X_plot)
+y_pred = model.predict(X_poly_plot)
 
-coeffs = regressionM(timeStamps, Velocity, 5)
-a, b, c, d, e, f = coeffs
-
+# Plotting
 fig = plt.figure()
 ax = plt.axes()
-
-line, = ax.plot(timeStamps, Velocity, 'b-')
-line, = ax.plot(timeStamps, function(timeStamps,a,b,c,d,e,f), 'r-')
-
+ax.scatter(timeStamps, Velocity, label='Original Data')
+ax.plot(timeStamps, y_pred, 'r-', label='nth Degree Polynomial Fit (scikit-learn)')
+ax.legend()
 plt.show()
