@@ -1,6 +1,7 @@
 import numpy as np
-from Test import ReadData as rd
+import ReadData as rd
 import matplotlib.pyplot as plt
+
 
 def compute_helicity_vectorized(x, Gamma, sigma):
     """
@@ -38,7 +39,7 @@ def compute_helicity_vectorized(x, Gamma, sigma):
 
     return H_sigma
 timeStamps = np.arange(0,1575,25)
-
+timestep = 1
 ttab=[]
 htab=[]
 for i in range(len(timeStamps)):
@@ -55,7 +56,7 @@ for i in range(len(timeStamps)):
     gamma = np.stack((Wx, Wy, Wz), axis=-1)
     H = compute_helicity_vectorized(x, gamma, sigma=1.0)
     print(H)
-    ttab.append(float(stringtime)/1000)
+    ttab.append(float(stringtime)*timestep)
     htab.append(H)
 plt.plot(ttab, htab)
 plt.ylabel('Helicity (|H|)')
