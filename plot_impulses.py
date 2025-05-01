@@ -1,56 +1,61 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import ReadData2 as rd
+from vtriClass import VortexRingInstance
 from Circulation_Impulse import compute_linear_impulse, compute_angular_impulse
 
-# ==== Load or generate your time-dependent vortex data ====
-# These should be lists of arrays, one per time step
-# Replace with your actual data loading if you have it from files
+# Configuration
+DATA_PATH = "dataset"
+FILENAME_TEMPLATE = "Vortex_Ring_DNS_Re7500_{:04d}.vtp"
+TIMESTAMPS = np.arange(25, 1575, 25)  # time values, step of 25
+DT = 0.005  # Optional, used for time axis scaling if needed
 
-timesteps = 10
-X_t = [np.random.rand(100) for _ in range(timesteps)]
-Y_t = [np.random.rand(100) for _ in range(timesteps)]
-Z_t = [np.random.rand(100) for _ in range(timesteps)]
-Wx_t = [np.random.rand(100) for _ in range(timesteps)]
-Wy_t = [np.random.rand(100) for _ in range(timesteps)]
-Wz_t = [np.random.rand(100) for _ in range(timesteps)]
+# Storage for results
+linear_impulses = []
+angular_impulses = []
 
-# ==== Compute impulses over time ====
+# Process each timestep
+for stamp in TIMESTAMPS:
+    print(f"Processing timestep {stamp}")
+    filepath = f"{DATA_PATH}/{FILENAME_TEMPLATE.format(stamp)}"
 
-linear_impulse_over_time = []
-angular_impulse_over_time = []
+    # Load data for this timestep
+    x, y, z, u, v, w, wx, wy, wz, radius, group_id, mu, mu_t = rd.readVortexRingInstance(filepath)
+    ring = VortexRingInstance(x, y, z, u, v, w, wx, wy, wz, radius, group_id, mu, mu_t)
 
-for i in range(timesteps):
-    L = compute_linear_impulse(X_t[i], Y_t[i], Z_t[i], Wx_t[i], Wy_t[i], Wz_t[i])
-    A = compute_angular_impulse(X_t[i], Y_t[i], Z_t[i], Wx_t[i], Wy_t[i], Wz_t[i])
-    linear_impulse_over_time.append(L)
-    angular_impulse_over_time.append(A)
+    # Compute impulse
+    L = compute_linear_impulse(ring.x, ring.y, ring.z, ring.wx, ring.wy, ring.wz)
+    A = compute_angular_impulse(ring.x, ring.y, ring.z, ring.wx, ring.wy, ring.wz)
 
-linear_impulse_over_time = np.array(linear_impulse_over_time)
-angular_impulse_over_time = np.array(angular_impulse_over_time)
+    linear_impulses.append(L)
+    angular_impulses.append(A)
 
-# ==== Time array (adjust if needed) ====
-time_array = np.arange(timesteps) * 0.025  # in seconds
+# Convert to NumPy arrays
+linear_impulses = np.array(linear_impulses)
+angular_impulses = np.array(angular_impulses)
 
-# ==== Plotting ====
+# Convert TIMESTAMPS to seconds (optional)
+times = TIMESTAMPS * DT
 
+# Plotting
 fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
-# --- Linear Impulse Plot ---
-axs[0].plot(time_array, linear_impulse_over_time[:, 0], label='Ix')
-axs[0].plot(time_array, linear_impulse_over_time[:, 1], label='Iy')
-axs[0].plot(time_array, linear_impulse_over_time[:, 2], label='Iz')
-axs[0].set_ylabel('Linear Impulse')
-axs[0].set_title('Linear Impulse over Time')
+# Linear Impulse Plot
+axs[0].plot(times, linear_impulses[:, 0], label="Ix")
+axs[0].plot(times, linear_impulses[:, 1], label="Iy")
+axs[0].plot(times, linear_impulses[:, 2], label="Iz")
+axs[0].set_ylabel("Linear Impulse")
+axs[0].set_title("Linear Impulse Over Time")
 axs[0].legend()
 axs[0].grid(True)
 
-# --- Angular Impulse Plot ---
-axs[1].plot(time_array, angular_impulse_over_time[:, 0], label='Jx')
-axs[1].plot(time_array, angular_impulse_over_time[:, 1], label='Jy')
-axs[1].plot(time_array, angular_impulse_over_time[:, 2], label='Jz')
-axs[1].set_ylabel('Angular Impulse')
-axs[1].set_xlabel('Time [s]')
-axs[1].set_title('Angular Impulse over Time')
+# Angular Impulse Plot
+axs[1].plot(times, angular_impulses[:, 0], label="Jx")
+axs[1].plot(times, angular_impulses[:, 1], label="Jy")
+axs[1].plot(times, angular_impulses[:, 2], label="Jz")
+axs[1].set_ylabel("Angular Impulse")
+axs[1].set_xlabel("Time [s]")
+axs[1].set_title("Angular Impulse Over Time")
 axs[1].legend()
 axs[1].grid(True)
 
