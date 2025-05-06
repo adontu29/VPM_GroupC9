@@ -137,7 +137,7 @@ def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
     return np.mean(ringStrength)
 
 @jit
-def getEnergy(X,Y,Z,Wx,Wy,Wz,radius):
+def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
     p = np.stack((X, Y, Z), axis=1)  # p coordinates
     q = p  # q coordinates
     ap = np.stack((Wx, Wy, Wz), axis=1)  # p particle strength
