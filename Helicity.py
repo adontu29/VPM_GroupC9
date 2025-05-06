@@ -1,6 +1,7 @@
 import numpy as np
 import ReadData as rd
 import matplotlib.pyplot as plt
+from numba import jit
 
 
 def compute_helicity_vectorized(x, Gamma, sigma):
@@ -39,7 +40,13 @@ def compute_helicity_vectorized(x, Gamma, sigma):
 
     return H_sigma
 timeStamps = np.arange(0,1575,25)
-timestep = 1
+ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
+ring_radius     = 1.0               # m, radius of the vortex ring
+ring_strength   = 1.0               # m²/s, vortex strength
+ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
+particle_distance  = 0.25*ring_thickness
+
+timestep = 5 * particle_distance**2/ring_strength
 ttab=[]
 htab=[]
 for i in range(len(timeStamps)):
