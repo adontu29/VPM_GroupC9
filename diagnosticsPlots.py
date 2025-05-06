@@ -14,7 +14,7 @@ def getArrays(timeStampsNames):
 
 def updateDiagnostics(i,X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t):
     # Velocity[i] = 0
-    # Strength[i] = rd.getStrength()
+    Strength[i] = rd.getStrength(Wx,Wy,Wz)
     # Impulse[i] = rd.getImpulse()
     KineticEnergy[i] = rd.getKineticEnergy(X,Y,Z,Wx,Wy,Wz,Radius)
     # Helicity[i] = rd.getHelicity()
@@ -55,7 +55,7 @@ dataset = 7500
 
 if dataset == 7500:
 
-# === Time Steps ===
+# === Time Steps/init ===
 
     ring_radius     = 1.0               # m, radius of the vortex ring
     ring_strength   = 1.0               # m²/s, vortex strength
@@ -64,6 +64,7 @@ if dataset == 7500:
     timeStep = 5 * particle_distance**2/ring_strength  # s
     timeStampsNames = np.arange(0,1575,25)
     timeStamps = timeStampsNames * timeStep
+    Velocity, Strength, Impulse, KineticEnergy, Helicity, Enstrophy = getArrays(timeStampsNames)
 
 # === Iteration per file ===
 
@@ -84,7 +85,7 @@ if dataset == 7500:
 
         # === Diagnostics Updated From ReadData.py ===
         
-        Velocity, Strength, Impulse, KineticEnergy, Helicity, Enstrophy = getArrays(timeStampsNames)
+        
 
         updateDiagnostics(i, X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t)
 
@@ -97,10 +98,11 @@ if dataset == 7500:
 
 elif dataset == 750:
 
-# === Time Steps ===
+# === Time Steps/init ===
 
     timeStep = 5.808E-03 * 25 #s
     timeStampsNames = np.arange(0,8600,25)
+    Velocity, Strength, Impulse, KineticEnergy, Helicity, Enstrophy = getArrays(timeStampsNames)
 
 # === Iteration per file ===
 
@@ -119,8 +121,6 @@ elif dataset == 750:
             continue
         
         # === Diagnostics Updated From ReadData.py ===
-
-        Velocity, Strength, Impulse, KineticEnergy, Helicity, Enstrophy = getArrays(timeStampsNames)
 
         updateDiagnostics(i, X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t)
 

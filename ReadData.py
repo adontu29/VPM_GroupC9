@@ -3,7 +3,7 @@ import math
 import vtk
 import numpy as np
 import matplotlib.pyplot as plt
-from numba import jit
+from numba import jit,njit
 
 ring_center0 = np.array([0.0, 0.0, 0.0])  # m, center of the vortex ring
 ring_radius0 = 1.0  # m, radius of the vortex ring
@@ -136,7 +136,7 @@ def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
 
     return np.mean(ringStrength)
 
-@jit
+@njit
 def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
     print("Getting Kinetic Energy ... ")
     p = np.stack((X, Y, Z), axis=1)  # p coordinates
@@ -152,7 +152,7 @@ def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
                 dotprd = np.dot(ap[i],aq[j])
                 rho = np.linalg.norm(p[i] - q[j])/sig
                 arr[i][j] = 1/np.linalg.norm(diff) * (((2*rho)/(rho**2+1)**(1/2))* dotprd + rho**3/(rho**2+1)**(3/2)*((np.dot((diff), ap[i]))*(np.dot((diff), aq[j])))/(np.linalg.norm(diff))**2 - dotprd)
-        if i % 25 == 0:
+        if i % 250 == 0:
             print(i)
     E = 1/(16*np.pi)*np.sum(arr)
     return E
