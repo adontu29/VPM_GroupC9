@@ -31,7 +31,7 @@ def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, radius):
     radius_cubed = radius * radius * radius
 
     for i in range(N):
-        for j in range(i + 1, N):
+        for j in range(N):
             dx = x[i] - x[j]
             dy = y[i] - y[j]
             dz = z[i] - z[j]
