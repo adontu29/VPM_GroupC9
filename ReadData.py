@@ -3,7 +3,7 @@ import math
 import vtk
 import numpy as np
 import matplotlib.pyplot as plt
-from numba import jit
+from numba import jit,njit
 
 ring_center0 = np.array([0.0, 0.0, 0.0])  # m, center of the vortex ring
 ring_radius0 = 1.0  # m, radius of the vortex ring
@@ -149,10 +149,12 @@ def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
         for j in range(i+1, len(q)):
             if j !=i:
                 diff = p[i]-q[j]
-                dotprd = np.dot(ap[i],aq[j])
+                dot_apaq =  ap[i,0] * aq[j,0] + ap[i,1] * aq[j,1] + ap[i,2] * aq[j,2] 
+                dot_diffap = ap[i,0] * diff[0] + ap[i,1] * diff[1] + ap[i,2] * diff[2] 
+                dot_diffaq = aq[j,0] * diff[0] + aq[j,1] * diff[1] + aq[j,2] * diff[2]  
                 rho = np.linalg.norm(p[i] - q[j])/sig
-                arr[i][j] = 1/np.linalg.norm(diff) * (((2*rho)/(rho**2+1)**(1/2))* dotprd + rho**3/(rho**2+1)**(3/2)*((np.dot((diff), ap[i]))*(np.dot((diff), aq[j])))/(np.linalg.norm(diff))**2 - dotprd)
-        if i % 25 == 0:
+                arr[i][j] = 1/np.linalg.norm(diff) * (((2*rho)/(rho**2+1)**(1/2))* dot_apaq + rho**3/(rho**2+1)**(3/2)*((dot_diffap)*(dot_diffaq))/(np.linalg.norm(diff))**2 - dot_apaq)
+        if i % 250 == 0:
             print(i)
     E = 1/(16*np.pi)*np.sum(arr)
     return E
