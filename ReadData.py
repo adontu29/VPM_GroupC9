@@ -90,7 +90,7 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
 
     return Radius_avg, VortexRingPosition
 
-def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos):
+def getRingCoreRadius0(X, Y, Z, Wx, Wy, Wz , RingPos, RingRadius):
     Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
     maxStrength = np.max(Strength_magnitude)
     Threshold = 0
@@ -101,6 +101,26 @@ def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos):
     coreRadiusZ = (np.max(np.abs(Z)) - np.min(np.abs(Z)))/2
     coreRadiusR = (np.max(Radius) - np.min(Radius))/2
     return coreRadiusR
+
+def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos, RingRadius):
+    Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
+    Strength_total = sum(Strength_magnitude)
+    maxStrength = np.max(Strength_magnitude)
+    Threshold = 0
+    X = X[Strength_magnitude > maxStrength * Threshold] - RingPos[0]
+    Y = Y[Strength_magnitude > maxStrength * Threshold] - RingPos[1]
+    Z = Z[Strength_magnitude > maxStrength * Threshold] - RingPos[2]
+    Radius = np.sqrt(np.square(Y) + np.square(Z))
+    coreRadiusZ = (np.max(np.abs(Z)) - np.min(np.abs(Z)))/2
+    coreRadiusR = (np.max(Radius) - np.min(Radius))/2
+
+    Core_radius_avg = 0
+    for i in range(len(Strength_magnitude)):
+        weight = Strength_magnitude[i]
+        Core_radius_avg += np.abs(Radius[i]-RingRadius) * weight
+
+    Core_radius_avg /= Strength_total
+    return Core_radius_avg
 
 def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
     # vorticity_magnitude = (ring_strength/(np.pi*ring_thickness**2)) * np.exp(-radial_distance_to_core**2/ring_thickness**2)
