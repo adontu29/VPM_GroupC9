@@ -4,7 +4,7 @@ from ReadData2 import readVortexRingInstance
 from numba import jit
 
 @jit
-def Energy(x,y,z,u,v,w,wx,wy,wz,radius,group_id,viscosity,viscosity_t ):
+def getEnergy(x,y,z,u,v,w,wx,wy,wz,radius,group_id,viscosity,viscosity_t ):
     p = np.stack((x, y, z), axis=1)  # p coordinates
     q = p  # q coordinates
     ap = np.stack((wx, wy, wz), axis=1)  # p particle strength
@@ -23,5 +23,5 @@ def Energy(x,y,z,u,v,w,wx,wy,wz,radius,group_id,viscosity,viscosity_t ):
 
 x,y,z,u,v,w,wx,wy,wz,radius,group_id,viscosity,viscosity_t = readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0025.vtp')
 
-print('kinetic energy is', Energy(x,y,z,u,v,w,wx,wy,wz,radius,group_id,viscosity,viscosity_t))
+print('kinetic energy is', getEnergy(x,y,z,u,v,w,wx,wy,wz,radius,group_id,viscosity,viscosity_t))
 
