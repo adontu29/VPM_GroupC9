@@ -148,8 +148,10 @@ def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
     for i in range(len(p)):
         for j in range(i+1, len(q)):
             if j !=i:
+                diff = p[i]-q[j]
+                dotprd = np.dot(ap[i],aq[j])
                 rho = np.linalg.norm(p[i] - q[j])/sig
-                arr[i][j] = 1/np.linalg.norm(p[i]-q[j]) * (((2*rho)/(rho**2+1)**(1/2))* np.dot(ap[i],aq[j]) + rho**3/(rho**2+1)**(3/2)*((np.dot((p[i]-q[j]), ap[i]))*(np.dot((p[i]-q[j]), aq[j])))/(np.linalg.norm(p[i]-q[j]))**2 - np.dot(ap[i], aq[j]))
+                arr[i][j] = 1/np.linalg.norm(diff) * (((2*rho)/(rho**2+1)**(1/2))* dotprd + rho**3/(rho**2+1)**(3/2)*((np.dot((diff), ap[i]))*(np.dot((diff), aq[j])))/(np.linalg.norm(diff))**2 - dotprd)
         if i % 25 == 0:
             print(i)
     E = 1/(16*np.pi)*np.sum(arr)
