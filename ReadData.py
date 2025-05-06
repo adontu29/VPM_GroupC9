@@ -158,5 +158,5 @@ def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
 @jit
 def getStrength(Wx, Wy, Wz):
     print("Getting Strength ... ")
-    strength = np.sum(np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2) / (2 * np.pi))
+    strength = np.sum(np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2) / (2 * np.pi)) # 1/s
     return strength
