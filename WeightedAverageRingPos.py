@@ -55,7 +55,7 @@ for i in range(len(timeStamps)):
 
     # Debugged: Properly unpack ring position
     ringRadius[i], ringPos0 = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
-    ringCoreRadius[i] = rd.getRingCoreRadius(X,Y,Z,Wx,Wy,Wz,ringPos0)
+    ringCoreRadius[i] = rd.getRingCoreRadius0(X,Y,Z,Wx,Wy,Wz,ringPos0,ringRadius[i])
 
     # Debugged: Ensure `Viscosity` is accessed correctly
     if np.ndim(Viscosity) == 1:
