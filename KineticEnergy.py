@@ -18,7 +18,7 @@ def getEnergy(x,y,z,u,v,w,wx,wy,wz,radius,group_id,viscosity,viscosity_t ):
                 arr[i][j] = 1/np.linalg.norm(p[i]-q[j]) * (((2*rho)/(rho**2+1)**(1/2))* np.dot(ap[i],aq[j]) + rho**3/(rho**2+1)**(3/2)*((np.dot((p[i]-q[j]), ap[i]))*(np.dot((p[i]-q[j]), aq[j])))/(np.linalg.norm(p[i]-q[j]))**2 - np.dot(ap[i], aq[j]))
         if i % 25 == 0:
             print(i)
-    E = 1/(16*np.pi)*sum(arr)
+    E = 1/(16*np.pi)*np.sum(arr)
     return E
 
 x,y,z,u,v,w,wx,wy,wz,radius,group_id,viscosity,viscosity_t = readVortexRingInstance('dataset/Vortex_Ring_DNS_Re7500_0025.vtp')

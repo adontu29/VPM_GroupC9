@@ -3,6 +3,7 @@ import math
 import vtk
 import numpy as np
 import matplotlib.pyplot as plt
+from numba import jit
 
 ring_center0 = np.array([0.0, 0.0, 0.0])  # m, center of the vortex ring
 ring_radius0 = 1.0  # m, radius of the vortex ring
@@ -90,7 +91,7 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
 
     return Radius_avg, VortexRingPosition
 
-def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos):
+def getRingCoreRadius0(X, Y, Z, Wx, Wy, Wz , RingPos, RingRadius):
     Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
     maxStrength = np.max(Strength_magnitude)
     Threshold = 0
@@ -101,6 +102,26 @@ def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos):
     coreRadiusZ = (np.max(np.abs(Z)) - np.min(np.abs(Z)))/2
     coreRadiusR = (np.max(Radius) - np.min(Radius))/2
     return coreRadiusR
+
+def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos, RingRadius):
+    Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
+    Strength_total = sum(Strength_magnitude)
+    maxStrength = np.max(Strength_magnitude)
+    Threshold = 0
+    X = X[Strength_magnitude > maxStrength * Threshold] - RingPos[0]
+    Y = Y[Strength_magnitude > maxStrength * Threshold] - RingPos[1]
+    Z = Z[Strength_magnitude > maxStrength * Threshold] - RingPos[2]
+    Radius = np.sqrt(np.square(Y) + np.square(Z))
+    coreRadiusZ = (np.max(np.abs(Z)) - np.min(np.abs(Z)))/2
+    coreRadiusR = (np.max(Radius) - np.min(Radius))/2
+
+    Core_radius_avg = 0
+    for i in range(len(Strength_magnitude)):
+        weight = Strength_magnitude[i]
+        Core_radius_avg += np.abs(Radius[i]-RingRadius) * weight
+
+    Core_radius_avg /= Strength_total
+    return Core_radius_avg
 
 def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
     # vorticity_magnitude = (ring_strength/(np.pi*ring_thickness**2)) * np.exp(-radial_distance_to_core**2/ring_thickness**2)
@@ -114,3 +135,21 @@ def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
     ringStrength = vorticityMagnitude*(np.exp(radialDistance**2/(coreRadius*2)**2))*(np.pi*(coreRadius*2)**2)
 
     return np.mean(ringStrength)
+
+@jit
+def getEnergy(X,Y,Z,Wx,Wy,Wz,radius):
+    p = np.stack((X, Y, Z), axis=1)  # p coordinates
+    q = p  # q coordinates
+    ap = np.stack((Wx, Wy, Wz), axis=1)  # p particle strength
+    aq = ap  # q particle strength
+    arr = np.zeros((len(p), len(q)))
+    sig = radius[0, 0]
+    for i in range(len(p)):
+        for j in range(i+1, len(q)):
+            if j !=i:
+                rho = np.linalg.norm(p[i] - q[j])/sig
+                arr[i][j] = 1/np.linalg.norm(p[i]-q[j]) * (((2*rho)/(rho**2+1)**(1/2))* np.dot(ap[i],aq[j]) + rho**3/(rho**2+1)**(3/2)*((np.dot((p[i]-q[j]), ap[i]))*(np.dot((p[i]-q[j]), aq[j])))/(np.linalg.norm(p[i]-q[j]))**2 - np.dot(ap[i], aq[j]))
+        if i % 25 == 0:
+            print(i)
+    E = 1/(16*np.pi)*np.sum(arr)
+    return E
