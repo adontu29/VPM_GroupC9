@@ -48,12 +48,13 @@ def calcEnstrophy_vec(ringInstance):
     summand = (factor1 * dot_strength + factor2 * dot_diff_strength1 * dot_diff_strength2) / radius**3
     np.fill_diagonal(summand, 0)
 
-    return np.sum(summand) / (4 * np.pi)
+    i_upper = np.triu_indices_from(summand, k=1)
+    return np.sum(summand[i_upper]) / (4 * np.pi)
 
 DATA_PATH = "dataset"
 FILENAME_TEMPLATE = "Vortex_Ring_DNS_Re7500_{:04d}.vtp"
 #TIMESTAMPS = np.arange(25, 1575, 25)  # in steps of 25
-TIMESTAMPS = np.arange(25, 500, 25)
+TIMESTAMPS = np.arange(25, 1575, 25)
 
 enstrophies = []
 times = []
