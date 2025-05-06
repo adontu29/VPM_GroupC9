@@ -153,3 +153,7 @@ def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
             print(i)
     E = 1/(16*np.pi)*np.sum(arr)
     return E
+
+def getTotalStrength(Wx, Wy, Wz):
+    strength = np.sum(np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2) / (2 * np.pi))
+    return strength
