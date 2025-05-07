@@ -35,7 +35,7 @@ def getHelicity(x, Gamma, sigma):
 
 
 
-timeStamps = np.arange(0,1575,25)
+timeStamps = np.arange(0,8600,25)
 
 ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
 ring_radius     = 1.0               # m, radius of the vortex ring
@@ -49,7 +49,7 @@ htab=[]
 for i in range(len(timeStamps)):
     stringtime = str(timeStamps[i]).zfill(4)
     # Debugged: Ensure correct file path format
-    filename = f'dataset/Vortex_Ring_DNS_Re7500_{stringtime}.vtp'
+    filename = f'dataset2/Vortex_Ring_{stringtime}.vtp'
 
     try:
         X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance(filename)
