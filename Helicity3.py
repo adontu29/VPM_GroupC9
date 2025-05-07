@@ -43,7 +43,8 @@ ring_strength   = 1.0               # m²/s, vortex strength
 ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
 particle_distance  = 0.25*ring_thickness
 
-timestep = 5 * particle_distance**2/ring_strength
+#timestep = 5 * particle_distance**2/ring_strength
+timestep = 0.005808
 ttab=[]
 htab=[]
 for i in range(len(timeStamps)):
