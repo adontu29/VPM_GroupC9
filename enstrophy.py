@@ -3,6 +3,20 @@ import ReadData2 as rd
 from vtriClass import VortexRingInstance
 import matplotlib.pyplot as plt
 
+ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
+ring_radius     = 1.0               # m, radius of the vortex ring
+ring_strength   = 1.0               # m²/s, vortex strength
+ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
+
+
+### Particle Distribution Setup
+Re = 7500                                   # Reynolds number
+particle_distance  = 0.25*ring_thickness    # m
+particle_radius    = 0.8*particle_distance**0.5  # m
+particle_viscosity = ring_strength/Re       # m²/s, kinematic viscosity
+time_step_size     = 5 * particle_distance**2/ring_strength  # s
+n_time_steps       = int( 20*ring_radius**2 / ring_strength / time_step_size)
+
 """def calcEnstrophy(ringInstance):
     summing = 0
     for i in range(len(ringInstance.x)):
@@ -66,7 +80,7 @@ for stamp in TIMESTAMPS:
 
     vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
 
-    times.append(stamp)
+    times.append(stamp*time_step_size)
     enstrophies.append(calcEnstrophy_vec(vtrInstance))
 
 

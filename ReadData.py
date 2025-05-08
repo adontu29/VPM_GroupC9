@@ -3,7 +3,7 @@ import math
 import vtk
 import numpy as np
 import matplotlib.pyplot as plt
-from numba import jit
+from numba import jit,njit
 
 ring_center0 = np.array([0.0, 0.0, 0.0])  # m, center of the vortex ring
 ring_radius0 = 1.0  # m, radius of the vortex ring
@@ -137,7 +137,8 @@ def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
     return np.mean(ringStrength)
 
 @jit
-def getEnergy(X,Y,Z,Wx,Wy,Wz,radius):
+def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
+    print("Getting Kinetic Energy ... ")
     p = np.stack((X, Y, Z), axis=1)  # p coordinates
     q = p  # q coordinates
     ap = np.stack((Wx, Wy, Wz), axis=1)  # p particle strength
@@ -147,9 +148,19 @@ def getEnergy(X,Y,Z,Wx,Wy,Wz,radius):
     for i in range(len(p)):
         for j in range(i+1, len(q)):
             if j !=i:
+                diff = p[i]-q[j]
+                dot_apaq =  ap[i,0] * aq[j,0] + ap[i,1] * aq[j,1] + ap[i,2] * aq[j,2] 
+                dot_diffap = ap[i,0] * diff[0] + ap[i,1] * diff[1] + ap[i,2] * diff[2] 
+                dot_diffaq = aq[j,0] * diff[0] + aq[j,1] * diff[1] + aq[j,2] * diff[2]  
                 rho = np.linalg.norm(p[i] - q[j])/sig
-                arr[i][j] = 1/np.linalg.norm(p[i]-q[j]) * (((2*rho)/(rho**2+1)**(1/2))* np.dot(ap[i],aq[j]) + rho**3/(rho**2+1)**(3/2)*((np.dot((p[i]-q[j]), ap[i]))*(np.dot((p[i]-q[j]), aq[j])))/(np.linalg.norm(p[i]-q[j]))**2 - np.dot(ap[i], aq[j]))
-        if i % 25 == 0:
+                arr[i][j] = 1/np.linalg.norm(diff) * (((2*rho)/(rho**2+1)**(1/2))* dot_apaq + rho**3/(rho**2+1)**(3/2)*((dot_diffap)*(dot_diffaq))/(np.linalg.norm(diff))**2 - dot_apaq)
+        if i % 250 == 0:
             print(i)
     E = 1/(16*np.pi)*np.sum(arr)
     return E
+
+@jit
+def getStrength(Wx, Wy, Wz):
+    print("Getting Strength ... ")
+    strength = np.sum(np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2) / (2 * np.pi)) # 1/s
+    return strength

@@ -1,34 +1,34 @@
 import numpy as np
 import ReadData as rd
 from numba import jit
+import math
 
 @jit
+def my_cross(a, b):
+    cx = a[1]*b[2] - a[2]*b[1]
+    cy = a[2]*b[0] - a[0]*b[2]
+    cz = a[0]*b[1] - a[1]*b[0]
+    return np.array([cx, cy, cz])
+@jit
 def compute_helicity(x, Gamma, sigma):
-    """
-    Compute regularized helicity H_sigma from a list of positions and vorticity vectors.
 
-    Parameters:
-        x: numpy array of shape (N, 3) - positions of particles
-        Gamma: numpy array of shape (N, 3) - vorticity vectors (or circulation vectors)
-        sigma: float - regularization parameter
-
-    Returns:
-        float - regularized helicity H_sigma
-    """
     N = x.shape[0]
     H_sigma = 0.0
 
     for p in range(N):
         for q in range(N):
             dx = x[p] - x[q]
-            dGamma_cross = np.cross(Gamma[p], Gamma[q])
+            dGamma_cross = my_cross(Gamma[p], Gamma[q])
             r2 = np.dot(dx, dx) + sigma ** 2
             denominator = r2 ** (1.5)
             contribution = np.dot(dx, dGamma_cross) / denominator
             H_sigma += contribution
 
-    H_sigma *= 1 / (4 * np.pi)
+
+    H_sigma *= 1 / (4 * math.pi)
+
     return H_sigma
+
 
 timeStamps = np.arange(0,1575,25)
 
