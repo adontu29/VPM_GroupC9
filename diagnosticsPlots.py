@@ -16,7 +16,7 @@ def updateDiagnostics(i,X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity
     # Velocity[i] = 0
     Strength[i] = rd.getStrength(Wx,Wy,Wz)
     # Impulse[i] = rd.getImpulse()
-    # KineticEnergy[i] = rd.getKineticEnergy(X,Y,Z,Wx,Wy,Wz,Radius)
+    KineticEnergy[i] = rd.getKineticEnergy(X,Y,Z,Wx,Wy,Wz,Radius)
     # Helicity[i] = rd.getHelicity()
     # Enstrophy[i] = rd.getEnstrophy()
 
@@ -30,13 +30,13 @@ def plotytyplotplot(timeStamps, Velocity, Strength, Impulse, KineticEnergy, Heli
     axs[0].plot(timeStamps, Velocity)
     axs[0].set_title('Velocity')
 
-    axs[1].plot(timeStamps, Strength)
+    axs[1].plot(timeStamps[1:], Strength[1:])
     axs[1].set_title('Strength')
 
     axs[2].plot(timeStamps, Impulse)
     axs[2].set_title('Impulse')
 
-    axs[3].plot(timeStamps, KineticEnergy)
+    axs[3].plot(timeStamps[1:], KineticEnergy[1:])
     axs[3].set_title('Kinetic Energy')
 
     axs[4].plot(timeStamps, Helicity)
@@ -46,7 +46,7 @@ def plotytyplotplot(timeStamps, Velocity, Strength, Impulse, KineticEnergy, Heli
     axs[5].set_title('Enstrophy')
 
     # Adjust layout
-    plt.tight_layout()
+
     plt.show()
         
 dataset = 7500
@@ -130,8 +130,6 @@ elif dataset == 750:
     plotytyplotplot(timeStamps, Velocity, Strength, Impulse, KineticEnergy, Helicity, Enstrophy)
 
 
-for i in range(len(timeStampsNames)):
-    print("peepee")
 
 
 

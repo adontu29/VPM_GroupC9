@@ -138,25 +138,35 @@ def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
 
 @jit
 def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
-    print("Getting Kinetic Energy ... ")
-    p = np.stack((X, Y, Z), axis=1)  # p coordinates
-    q = p  # q coordinates
-    ap = np.stack((Wx, Wy, Wz), axis=1)  # p particle strength
-    aq = ap  # q particle strength
-    arr = np.zeros((len(p), len(q)))
+    n = len(X)
     sig = radius[0, 0]
-    for i in range(len(p)):
-        for j in range(i+1, len(q)):
-            if j !=i:
-                diff = p[i]-q[j]
-                dot_apaq =  ap[i,0] * aq[j,0] + ap[i,1] * aq[j,1] + ap[i,2] * aq[j,2] 
-                dot_diffap = ap[i,0] * diff[0] + ap[i,1] * diff[1] + ap[i,2] * diff[2] 
-                dot_diffaq = aq[j,0] * diff[0] + aq[j,1] * diff[1] + aq[j,2] * diff[2]  
-                rho = np.linalg.norm(p[i] - q[j])/sig
-                arr[i][j] = 1/np.linalg.norm(diff) * (((2*rho)/(rho**2+1)**(1/2))* dot_apaq + rho**3/(rho**2+1)**(3/2)*((dot_diffap)*(dot_diffaq))/(np.linalg.norm(diff))**2 - dot_apaq)
+    E = 0.0
+    for i in range(n):
+        for j in range(i+1, n):
+            dx = X[i] - X[j]
+            dy = Y[i] - Y[j]
+            dz = Z[i] - Z[j]
+            norm_sq = dx*dx + dy*dy + dz*dz
+            norm = np.sqrt(norm_sq)
+            rho = norm / sig
+
+            # ap[i] and aq[j] dot product
+            dot_apaq = Wx[i]*Wx[j] + Wy[i]*Wy[j] + Wz[i]*Wz[j]
+            
+            # dot_diffap and dot_diffaq
+            dot_diffap = Wx[i]*dx + Wy[i]*dy + Wz[i]*dz
+            dot_diffaq = Wx[j]*dx + Wy[j]*dy + Wz[j]*dz
+
+            term1 = (2*rho)/np.sqrt(rho**2 + 1) * dot_apaq
+            term2 = (rho**3)/( (rho**2 + 1)**1.5 ) * (dot_diffap * dot_diffaq) / norm_sq
+            contribution = (1.0 / norm) * (term1 + term2 - dot_apaq)
+            E += contribution
+
+        # Optional progress update (disable in performance runs)
         if i % 250 == 0:
-            print(i)
-    E = 1/(16*np.pi)*np.sum(arr)
+            print(i)  # or: print(i) if testing outside @njit
+
+    E = E / (16 * np.pi)
     return E
 
 @jit
