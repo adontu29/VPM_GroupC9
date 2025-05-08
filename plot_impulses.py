@@ -42,22 +42,21 @@ fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
 # Linear Impulse Plot
 axs[0].plot(times, linear_impulses[:, 0], label="Ix")
-#axs[0].plot(times, linear_impulses[:, 1], label="Iy")
-#axs[0].plot(times, linear_impulses[:, 2], label="Iz")
-axs[0].set_ylabel("Linear Impulse")
+axs[0].set_xlabel("Time [s]")
+axs[0].set_ylabel("Linear Impulse [kg·m/s]")
 axs[0].set_title("Linear Impulse Over Time")
-axs[0].legend()
 axs[0].grid(True)
+axs[0].set_ylim(bottom=0, top=3.2)  # Set y-axis to start from 0 and go up to 3.2
+axs[0].legend(loc='lower right')  # Place legend in bottom-right corner
 
 # Angular Impulse Plot
-#axs[1].plot(times, angular_impulses[:, 0], label="Jx")
-#axs[1].plot(times, angular_impulses[:, 1], label="Jy")
-axs[1].plot(times, angular_impulses[:, 2], label="Jz")
-axs[1].set_ylabel("Angular Impulse")
+axs[1].plot(times, angular_impulses[:, 2], label="Iz")
 axs[1].set_xlabel("Time [s]")
+axs[1].set_ylabel("Angular Impulse [kg·m²/s]")
 axs[1].set_title("Angular Impulse Over Time")
-axs[1].legend()
 axs[1].grid(True)
+axs[1].set_ylim(top=0.5, bottom=-1)  # Set y-axis to range from -1 to 0.5
+axs[1].legend(loc='lower right')  # Place legend in bottom-right corner
 
 plt.tight_layout()
 plt.show()
