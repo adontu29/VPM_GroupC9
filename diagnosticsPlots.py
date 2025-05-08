@@ -16,7 +16,7 @@ def updateDiagnostics(i,X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity
     # Velocity[i] = 0
     Strength[i] = rd.getStrength(Wx,Wy,Wz)
     # Impulse[i] = rd.getImpulse()
-    KineticEnergy[i] = rd.getKineticEnergy(X,Y,Z,Wx,Wy,Wz,Radius)
+    # KineticEnergy[i] = rd.getKineticEnergy(X,Y,Z,Wx,Wy,Wz,Radius)
     # Helicity[i] = rd.getHelicity()
     # Enstrophy[i] = rd.getEnstrophy()
 
