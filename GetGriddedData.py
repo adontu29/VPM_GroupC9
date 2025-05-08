@@ -9,22 +9,15 @@ def calcDist (instance1, instance2):
 
 def zeta(rho):
     return 15/8/np.pi/(rho**2+1)**(7/2)
-def G(rho):
-    return (rho**2+3/2)/(rho**2+1)**(3/2)/4/np.pi
 def q(rho):
     return rho**3*(rho**2+5/2)/(rho**2+1)**(5/2)/4/np.pi
-def kernel(rho):
-    return rho**3/(rho**2+1)**(3/2)/4/np.pi
 def reg_zeta(rho,radius):
     rho = rho/radius
     return 15/8/np.pi/(rho**2+1)**(7/2)/radius**3
-def reg_G(rho):
-    return (rho**2+3/2)/(rho**2+1)**(3/2)/4/np.pi
 def reg_q(rho,radius):
     rho=rho/radius
     return rho**3*(rho**2+5/2)/(rho**2+1)**(5/2)/4/np.pi
-def kernel(rho):
-    return rho**3/(rho**2+1)**(3/2)/4/np.pi
+
 
 ring_center   = np.array([0.0, 0.0, 0.0]) # m, center of the vortex
 ring_radius   = 1.0              # m, radius of the vortex ring
@@ -71,9 +64,20 @@ for i in range(len(timeStamps)):
     grid_shape = XGrid.shape
     grid_points = np.stack((XGrid.ravel(), YGrid.ravel(), ZGrid.ravel()), axis=-1)
     particle_pos = np.stack((X, Y, Z), axis=-1)  # shape: (N_particles, 3)
-
+    Gamma = np.stack((Wx, Wy, Wz), axis=-1)  # shape: (N_particles, 3), already circulation
     omega_grid = np.zeros_like(grid_points)
 
     for p in range(particle_pos.shape[0]):
         r = grid_points - particle_pos[p]
-        r_mag = np.linalg.norm(r)
+        r_mag = np.linalg.norm(r, axis = 1)
+
+        r_mag[r_mag == 0] = 1e-12
+        r_cubed = r_mag**3
+        r_squared = r_mag**2
+        omega_grid_contrib = ((reg_zeta(r_mag,particle_radius) - reg_q(r_mag,particle_radius)/r_cubed) * Gamma[p] +
+                              np.cross((3*reg_q(r_mag,particle_radius)/r_cubed) - reg_zeta(r_mag,particle_radius),
+                              np.dot(r,Gamma[p])/r_squared*r))
+        omega_grid+=omega_grid_contrib
+
+
+
