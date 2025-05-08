@@ -4,6 +4,7 @@ from vtriClass import VortexRingInstance
 import matplotlib.pyplot as plt
 from numba import njit
 from scipy.spatial import cKDTree
+import math
 
 # --------------------------
 # Vortex ring configuration
@@ -15,10 +16,11 @@ ring_thickness  = 0.2 * ring_radius           # m
 
 # Particle configuration
 Re = 7500
-particle_distance  = 0.25 * ring_thickness    # m
+particle_distance  = 0.22 * ring_thickness    # m
 particle_radius    = 0.8 * particle_distance**0.5
 particle_viscosity = ring_strength / Re
-time_step_size     = 5 * particle_distance**2 / ring_strength  # s
+#time_step_size     = 3 * particle_distance**2 / ring_strength  # s
+time_step_size = 0.005808
 n_time_steps       = int(20 * ring_radius**2 / ring_strength / time_step_size)
 
 # ------------------------------------------
@@ -65,7 +67,7 @@ def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, radius):
 # -------------------------------
 DATA_PATH = "dataset2"
 FILENAME_TEMPLATE = "Vortex_Ring_{:04d}.vtp"
-TIMESTAMPS = np.arange(25, 8600, 25)
+TIMESTAMPS = np.arange(25, 8600, 250)  # Process every 10th file (10x speedup)
 
 enstrophies = []
 times = []
@@ -99,12 +101,13 @@ for stamp in TIMESTAMPS:
     ring_strength = np.mean(np.linalg.norm(strengths, axis=1))
 
     # Time step
-    time_step_size = 5 * particle_distance**2 / ring_strength
-    cumulative_time += time_step_size
-
+    #time_step_size = 5 * particle_distance**2 / ring_strength
+    time_step_size=0.005808
+    cumulative_time = time_step_size*stamp
+    print(stamp)
     # Enstrophy calculation
     enstrophy = calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz, float(Radius[1]))
-    enstrophies.append(enstrophy)
+    enstrophies.append(enstrophy/(0.2*4*math.pi*math.pi))
     times.append(cumulative_time)
 
 # -------------------------------
@@ -113,8 +116,7 @@ for stamp in TIMESTAMPS:
 plt.plot(times, enstrophies)
 plt.xlabel("Time (s)")
 plt.ylabel("Enstrophy")
-plt.title("Enstrophy Evolution with Dynamic Time Step")
+plt.title("Enstrophy Evolution with Dynamic Time Step (Reduced Data)")
 plt.grid(True)
 plt.tight_layout()
 plt.show()
-
