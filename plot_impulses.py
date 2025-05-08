@@ -42,16 +42,16 @@ fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
 # Linear Impulse Plot
 axs[0].plot(times, linear_impulses[:, 0], label="Ix")
-axs[0].plot(times, linear_impulses[:, 1], label="Iy")
-axs[0].plot(times, linear_impulses[:, 2], label="Iz")
+#axs[0].plot(times, linear_impulses[:, 1], label="Iy")
+#axs[0].plot(times, linear_impulses[:, 2], label="Iz")
 axs[0].set_ylabel("Linear Impulse")
 axs[0].set_title("Linear Impulse Over Time")
 axs[0].legend()
 axs[0].grid(True)
 
 # Angular Impulse Plot
-axs[1].plot(times, angular_impulses[:, 0], label="Jx")
-axs[1].plot(times, angular_impulses[:, 1], label="Jy")
+#axs[1].plot(times, angular_impulses[:, 0], label="Jx")
+#axs[1].plot(times, angular_impulses[:, 1], label="Jy")
 axs[1].plot(times, angular_impulses[:, 2], label="Jz")
 axs[1].set_ylabel("Angular Impulse")
 axs[1].set_xlabel("Time [s]")
