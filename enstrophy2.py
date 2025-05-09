@@ -25,12 +25,14 @@ n_time_steps       = int(20 * ring_radius**2 / ring_strength / time_step_size)
 
 # ------------------------------------------
 # Numba-safe enstrophy calculation function
-# ------------------------------------------
+# ----
+# 
+# --------------------------------------
 @njit
-def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, radius):
+def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, particle_radius):
     N = x.shape[0]
     enstrophy = 0.0
-    radius_cubed = radius * radius * radius
+    radius_cubed = particle_radius ** 3
 
     for i in range(N):
         for j in range(N):
@@ -38,8 +40,10 @@ def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, radius):
             dy = y[i] - y[j]
             dz = z[i] - z[j]
 
+            
+
             r2 = dx * dx + dy * dy + dz * dz
-            rho2 = r2 / (radius * radius)
+            rho2 = r2 / particle_radius**2
 
             denom1 = (rho2 + 1.0)**3.5
             denom2 = (rho2 + 1.0)**4.5
@@ -106,7 +110,7 @@ for stamp in TIMESTAMPS:
     cumulative_time = time_step_size*stamp
     print(stamp)
     # Enstrophy calculation
-    enstrophy = calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz, float(Radius[1]))
+    enstrophy = calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz,particle_radius )
     enstrophies.append(enstrophy/(0.2*4*math.pi*math.pi))
     times.append(cumulative_time)
 
