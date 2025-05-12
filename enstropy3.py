@@ -19,42 +19,63 @@ time_step_size = 0.005808
 n_time_steps = int(20 * ring_radius ** 2 / ring_strength / time_step_size)
 
 
-@njit(parallel=True)
-def calcEnstrophy(x, Gamma, sigma):
-    # Ensure all inputs are 1D arrays and cast to float64
-    N = x.shape[0]
-    #R = radius
-    partial_sums = np.zeros(N, dtype=np.float64)  # Change dtype to float64 explicitly
-    local_sum = np.zeros(N, dtype=np.float64)
-    for i in prange(N):
 
-        for j in range(N):
-            dx = x[i] - x[j]
-            dgammap = np.dot(dx, gamma[i])
-            dgammaq = np.dot(dx, gamma[j])
+@njit(parallel=True)
+def calcEnstrophy(x, gamma, sigma ):
+    N = x.shape[0]
+    partial_sums = 0.0
+    sigma3 = sigma ** 3
+    cutoff2 = (3.0 * sigma) ** 2  # Ignore distant pairs
+
+    for i in prange(N):
+        local_sum = 0.0
+        for j in range(i+1, N):
+            dx0 = x[i, 0] - x[j, 0]
+            dx1 = x[i, 1] - x[j, 1]
+            dx2 = x[i, 2] - x[j, 2]
+            dx = np.array([dx0, dx1, dx2])
+
+            rho2 = (dx0**2 + dx1**2 + dx2**2)/sigma
+            if rho2 > cutoff2:
+                continue
+
+            dgammap = dx0 * gamma[i, 0] + dx1 * gamma[i, 1] + dx2 * gamma[i, 2]
+            dgammaq = dx0 * gamma[j, 0] + dx1 * gamma[j, 1] + dx2 * gamma[j, 2]
             dgamma = dgammap * dgammaq
-            rho = np.abs(dx) / sigma
-            rho2 = rho**2
 
             denom1 = (rho2 + 1.0) ** 3.5
             denom2 = (rho2 + 1.0) ** 4.5
 
+            dot_gamma = gamma[i, 0] * gamma[j, 0] + gamma[i, 1] * gamma[j, 1] + gamma[i, 2] * gamma[j, 2]
+
             factor1 = (5.0 - rho2 * (rho2 + 3.5)) / denom1
             factor2 = 3.0 * (rho2 * (rho2 + 4.5) + 3.5) / denom2
-            totalfactor = (factor1 * np.dot(gamma[i], gamma[j]) + factor2) * dgamma
-            finalfactor = totalfactor / (sigma**3)
+
+            totalfactor = factor1 * dot_gamma + factor2 * dgamma
+            finalfactor = totalfactor / sigma3
 
             local_sum += finalfactor
 
-        partial_sums[i] = local_sum  # Store directly into the array
+        partial_sums += local_sum
 
-    return np.sum(partial_sums) / (4.0 * np.pi)
+    return partial_sums / (4.0 * np.pi)
+
 
 
 # Read data
-DATA_PATH = "dataset"
-FILENAME_TEMPLATE = "Vortex_Ring_DNS_Re7500_{:04d}.vtp"
-timeStamps = np.arange(25, 1575, 25)
+DATA_PATH = "dataset2"
+FILENAME_TEMPLATE = "Vortex_Ring_{:04d}.vtp"
+timeStamps = np.arange(0,8600,200)
+
+ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
+ring_radius     = 1.0               # m, radius of the vortex ring
+ring_strength   = 1.0               # m²/s, vortex strength
+ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
+
+particle_distance  = 0.3*ring_thickness    # m
+particle_radius    = 0.8*particle_distance**0.5
+#timestep = 5 * particle_distance**2/ring_strength
+timestep = 0.005808
 
 enstrophies = []
 times = []
@@ -72,8 +93,9 @@ for i in range(len(timeStamps)):
         continue
     x = np.stack((X, Y, Z), axis=-1)
     gamma = np.stack((Wx, Wy, Wz), axis=-1)
-    enstrophies.append(calcEnstrophy(x, gamma, sigma=1))
-    times.append(stringtime * time_step_size)
+    print(calcEnstrophy(x, gamma, sigma=particle_radius))
+    enstrophies.append(calcEnstrophy(x, gamma, sigma=particle_radius))
+    times.append(float(stringtime) * timestep)
 """for stamp in TIMESTAMPS:
     print(stamp)
     filename = f"{DATA_PATH}/{FILENAME_TEMPLATE.format(stamp)}"

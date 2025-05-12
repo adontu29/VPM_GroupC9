@@ -108,7 +108,7 @@ for stamp in TIMESTAMPS:
     #time_step_size = 5 * particle_distance**2 / ring_strength
     time_step_size=0.005808
     cumulative_time = time_step_size*stamp
-    print(stamp)
+    print(calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz,particle_radius ))
     # Enstrophy calculation
     enstrophy = calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz,particle_radius )
     enstrophies.append(enstrophy/(0.2*4*math.pi*math.pi))
