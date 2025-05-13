@@ -35,7 +35,7 @@ def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, particle_radius):
     radius_cubed = particle_radius ** 3
 
     for i in range(N):
-        for j in range(N):
+        for j in range(i+1,N):
             dx = x[i] - x[j]
             dy = y[i] - y[j]
             dz = z[i] - z[j]
@@ -43,7 +43,7 @@ def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, particle_radius):
             
 
             r2 = dx * dx + dy * dy + dz * dz
-            rho2 = r2 / particle_radius**2
+            rho2 = r2 / (particle_radius**2)
 
             denom1 = (rho2 + 1.0)**3.5
             denom2 = (rho2 + 1.0)**4.5

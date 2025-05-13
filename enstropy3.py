@@ -25,11 +25,11 @@ def calcEnstrophy(x, gamma, sigma ):
     N = x.shape[0]
     partial_sums = 0.0
     sigma3 = sigma ** 3
-    cutoff2 = (3.0 * sigma) ** 2  # Ignore distant pairs
+    cutoff2 = (100.0 * sigma) ** 2  # Ignore distant pairs
 
     for i in prange(N):
         local_sum = 0.0
-        for j in range(i+1, N):
+        for j in range(N):
             dx0 = x[i, 0] - x[j, 0]
             dx1 = x[i, 1] - x[j, 1]
             dx2 = x[i, 2] - x[j, 2]
@@ -73,7 +73,7 @@ ring_strength   = 1.0               # m²/s, vortex strength
 ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
 
 particle_distance  = 0.3*ring_thickness    # m
-particle_radius    = 0.8*particle_distance**0.5
+particle_radius    = 0.8*(particle_distance**0.5)
 #timestep = 5 * particle_distance**2/ring_strength
 timestep = 0.005808
 
@@ -93,8 +93,8 @@ for i in range(len(timeStamps)):
         continue
     x = np.stack((X, Y, Z), axis=-1)
     gamma = np.stack((Wx, Wy, Wz), axis=-1)
-    print(calcEnstrophy(x, gamma, sigma=particle_radius))
-    enstrophies.append(calcEnstrophy(x, gamma, sigma=particle_radius))
+    print(calcEnstrophy(x, gamma, particle_radius))
+    enstrophies.append(calcEnstrophy(x, gamma, particle_radius))
     times.append(float(stringtime) * timestep)
 """for stamp in TIMESTAMPS:
     print(stamp)
