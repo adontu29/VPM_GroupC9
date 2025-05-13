@@ -66,10 +66,10 @@ def calcEnstrophy_vec(ringInstance):
     i_upper = np.triu_indices_from(summand, k=1)
     return np.sum(summand[i_upper]) / (4 * np.pi)
 
-DATA_PATH = "dataset"
-FILENAME_TEMPLATE = "Vortex_Ring_DNS_Re7500_{:04d}.vtp"
+DATA_PATH = "dataset2"
+FILENAME_TEMPLATE = "Vortex_Ring_{:04d}.vtp"
 #TIMESTAMPS = np.arange(25, 1575, 25)  # in steps of 25
-TIMESTAMPS = np.arange(25, 1575, 25)
+TIMESTAMPS = np.arange(25, 8600, 225)
 
 enstrophies = []
 times = []
@@ -83,7 +83,7 @@ for stamp in TIMESTAMPS:
 
     times.append(stamp*time_step_size)
     enstrophies.append(calcEnstrophy_vec(vtrInstance))
-
+    print(calcEnstrophy_vec(vtrInstance))
 
 plt.plot(times, enstrophies)
 plt.show()
