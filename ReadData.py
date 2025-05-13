@@ -3,6 +3,7 @@ import math
 import vtk
 import numpy as np
 import matplotlib.pyplot as plt
+from numba import jit,njit
 
 ring_center0 = np.array([0.0, 0.0, 0.0])  # m, center of the vortex ring
 ring_radius0 = 1.0  # m, radius of the vortex ring
@@ -81,7 +82,7 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
         Y_avg += Y[i] * weight
         Z_avg += Z[i] * weight
         Radius_avg += PositionVector[i] * weight
-    # Radius_avg = np.sqrt(X_avg**2+Z_avg**2)
+
     X_avg /= Strength_total
     Y_avg /= Strength_total
     Z_avg /= Strength_total
@@ -90,7 +91,7 @@ def getRingPosRadius(X, Y, Z, Wx, Wy, Wz):
 
     return Radius_avg, VortexRingPosition
 
-def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos):
+def getRingCoreRadius0(X, Y, Z, Wx, Wy, Wz , RingPos, RingRadius):
     Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
     maxStrength = np.max(Strength_magnitude)
     Threshold = 0
@@ -101,6 +102,26 @@ def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos):
     coreRadiusZ = (np.max(np.abs(Z)) - np.min(np.abs(Z)))/2
     coreRadiusR = (np.max(Radius) - np.min(Radius))/2
     return coreRadiusR
+
+def getRingCoreRadius(X, Y, Z, Wx, Wy, Wz , RingPos, RingRadius):
+    Strength_magnitude = np.sqrt(np.square(Wx) + np.square(Wy) + np.square(Wz))
+    Strength_total = sum(Strength_magnitude)
+    maxStrength = np.max(Strength_magnitude)
+    Threshold = 0
+    X = X[Strength_magnitude > maxStrength * Threshold] - RingPos[0]
+    Y = Y[Strength_magnitude > maxStrength * Threshold] - RingPos[1]
+    Z = Z[Strength_magnitude > maxStrength * Threshold] - RingPos[2]
+    Radius = np.sqrt(np.square(Y) + np.square(Z))
+    coreRadiusZ = (np.max(np.abs(Z)) - np.min(np.abs(Z)))/2
+    coreRadiusR = (np.max(Radius) - np.min(Radius))/2
+
+    Core_radius_avg = 0
+    for i in range(len(Strength_magnitude)):
+        weight = Strength_magnitude[i]
+        Core_radius_avg += np.abs(Radius[i]-RingRadius) * weight
+
+    Core_radius_avg /= Strength_total
+    return Core_radius_avg
 
 def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
     # vorticity_magnitude = (ring_strength/(np.pi*ring_thickness**2)) * np.exp(-radial_distance_to_core**2/ring_thickness**2)
@@ -115,20 +136,41 @@ def getRingStrength(X, Y, Z, Wx, Wy, Wz, RingPos,particleRadius, coreRadius):
 
     return np.mean(ringStrength)
 
+@jit
+def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
+    n = len(X)
+    sig = radius[0, 0]
+    E = 0.0
+    for i in range(n):
+        for j in range(i+1, n):
+            dx = X[i] - X[j]
+            dy = Y[i] - Y[j]
+            dz = Z[i] - Z[j]
+            norm_sq = dx*dx + dy*dy + dz*dz
+            norm = np.sqrt(norm_sq)
+            rho = norm / sig
 
-def calculateRingCirculation(X,Y,Z,Wx,Wy,Wz,RingPos,Treshold):
-    i = 0
-    X_inplane, Y_inplane, Z_inplane = [], [], []
-    Wx_inplane, Wy_inplane, Wz_inplane = []
-    while i < len(X):
-        if abs(X[i]) < Treshold:
-            X_inplane.append(X[i])
-            Wx_inplane.append(Wx[i])
-            Y_inplane.append(Y[i])
-            Wy_inplane.append(Wy[i])
-            Z_inplane.append(Z[i])
-            Wz_inplane.append(Wz[i])
-            i += 1
-        else :
-            i += 1
-    return X_inplane, Wx_inplane, Y_inplane, Wy_inplane, Z_inplane, Wz_inplane
+            # ap[i] and aq[j] dot product
+            dot_apaq = Wx[i]*Wx[j] + Wy[i]*Wy[j] + Wz[i]*Wz[j]
+            
+            # dot_diffap and dot_diffaq
+            dot_diffap = Wx[i]*dx + Wy[i]*dy + Wz[i]*dz
+            dot_diffaq = Wx[j]*dx + Wy[j]*dy + Wz[j]*dz
+
+            term1 = (2*rho)/np.sqrt(rho**2 + 1) * dot_apaq
+            term2 = (rho**3)/( (rho**2 + 1)**1.5 ) * (dot_diffap * dot_diffaq) / norm_sq
+            contribution = (1.0 / norm) * (term1 + term2 - dot_apaq)
+            E += contribution
+
+        # Optional progress update (disable in performance runs)
+        if i % 250 == 0:
+            print(i)  # or: print(i) if testing outside @njit
+
+    E = E / (16 * np.pi)
+    return E
+
+@jit
+def getStrength(Wx, Wy, Wz):
+    print("Getting Strength ... ")
+    strength = np.sum(np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2) / (2 * np.pi)) # 1/s
+    return strength
