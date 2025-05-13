@@ -2,7 +2,25 @@ import numpy as np
 import math as m
 import matplotlib.pyplot as plt
 import ReadData as rd
+from numba import jit
 
+
+ring_center   = np.array([0.0, 0.0, 0.0])
+ring_radius   = 1.0
+ring_strength = 1.0
+ring_thickness = 0.2 * ring_radius
+
+Re = 750
+particle_distance  = 0.22 * ring_thickness
+particle_radius    = 0.8 * particle_distance**0.5
+particle_viscosity = ring_strength / Re
+time_step_size     = 25 * 3 * particle_distance**2 / ring_strength
+n_time_steps       = int(100 * ring_radius**2 / ring_strength / time_step_size)
+max_timesteps = 8600
+no_timesteps = int(8600 / 25 + 1)
+
+timeStampsNames = np.arange(0, max_timesteps + 1, 25)
+timeStamps = np.arange(0, no_timesteps * time_step_size, time_step_size)
 def zeta(rho):
     return 15 / (8 * np.pi * (rho**2 + 1)**(7/2))
 
@@ -17,10 +35,31 @@ def reg_q(rho, radius):
     rho = rho / radius
     return (rho**3 * (rho**2 + 2.5)) / ((rho**2 + 1)**(5/2)) / (4 * np.pi)
 
-def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius):
+
+def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius,XGrid,YGrid,ZGrid):
     """
     Computes the vorticity field at each grid point due to vortex particles.
     """
+
+    # Toroidal radial distance from ring core centerline (in yz-plane)
+    r_yz = np.sqrt(YGrid ** 2 + ZGrid ** 2)
+    radial_distance_to_core = np.abs(r_yz - ring_radius)
+
+    # Azimuthal angle theta in the yz-plane
+    theta = np.arctan2(ZGrid, YGrid)
+
+    # Vorticity magnitude: Gaussian in r, localized in x
+    vorticity_magnitude = (ring_strength / (np.pi * ring_thickness ** 2)) * \
+                          np.exp(-radial_distance_to_core ** 2 / ring_thickness ** 2)
+
+    x_decay = np.exp(-XGrid ** 2 / ring_thickness ** 2)
+
+    # Vorticity vector components
+    omega_x_analytic = np.zeros_like(XGrid)
+    omega_y_analytic = -vorticity_magnitude * np.sin(theta) * x_decay
+    omega_z_analytic = vorticity_magnitude * np.cos(theta) * x_decay
+    omega_grid_analytical = np.stack((omega_x_analytic.ravel(), omega_y_analytic.ravel(), omega_z_analytic.ravel()), axis=-1)
+
     omega_grid = np.zeros_like(grid_points)
 
     for p in range(particle_pos.shape[0]):
@@ -46,37 +85,25 @@ def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius):
 
         omega_grid += term1 + term2
 
-    return omega_grid
+    return omega_grid, omega_grid_analytical
 
 
-# ========== Simulation Setup ==========
-
-ring_center   = np.array([0.0, 0.0, 0.0])
-ring_radius   = 1.0
-ring_strength = 1.0
-ring_thickness = 0.2 * ring_radius
-
-Re = 750
-particle_distance  = 0.22 * ring_thickness
-particle_radius    = 0.8 * particle_distance**0.5
-particle_viscosity = ring_strength / Re
-time_step_size     = 25 * 3 * particle_distance**2 / ring_strength
-n_time_steps       = int(100 * ring_radius**2 / ring_strength / time_step_size)
-max_timesteps = 8600
-no_timesteps = int(8600 / 25 + 1)
-
-timeStampsNames = np.arange(0, max_timesteps + 1, 25)
-timeStamps = np.arange(0, no_timesteps * time_step_size, time_step_size)
 
 # Grid setup
-xGrid = np.arange(-1.5, 1.5, 0.1)
-yGrid = np.arange(-0.3, 4.3, 0.1)
-zGrid = np.arange(-1.5, 1.5, 0.1)
+
+# Define the ranges for x, y, and z axes
+xGrid = np.arange(-1.5, 1.5, 0.01)
+yGrid = np.arange(-0.3, 4.3, 0.01)
+zGrid = np.arange(-1.5, 1.5, 0.01)
+
+# Create the 3D grid
 XGrid, YGrid, ZGrid = np.meshgrid(xGrid, yGrid, zGrid, indexing='ij')
 grid_points = np.stack((XGrid.ravel(), YGrid.ravel(), ZGrid.ravel()), axis=-1)
 
 ringPos = []
 ringRadius = np.ones(len(timeStamps))
+
+
 
 
 # ========== Time Loop ==========
@@ -96,12 +123,16 @@ for i in range(0,1):
     particle_pos = np.stack((X, Y, Z), axis=-1)
     Gamma = np.stack((Wx, Wy, Wz), axis=-1)
 
-    omega_grid = compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius)
+    omega_grid, omega_grid_analytical = compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius,XGrid, YGrid, ZGrid)
 
     # Reshape to grid
     omega_x = omega_grid[:, 0].reshape(XGrid.shape)
     omega_y = omega_grid[:, 1].reshape(YGrid.shape)
     omega_z = omega_grid[:, 2].reshape(ZGrid.shape)
+
+    omega_x_analytical = omega_grid_analytical[:, 0].reshape(XGrid.shape)
+    omega_y_analytical = omega_grid_analytical[:, 1].reshape(YGrid.shape)
+    omega_z_analytical = omega_grid_analytical[:, 2].reshape(ZGrid.shape)
 
     # === Plot vorticity in cross-section perpendicular to y-axis at the vortex center ===
 
@@ -138,18 +169,19 @@ for i in range(0,1):
 
     # Extract ω_y along y = center line in the slice
     omega_y_line = omega_y[:, y_line_index, :]
+    expected_omega_y_centerline = omega_y_analytical[:, y_line_index, :]
 
     # Choose a line at the center of that slice (e.g. at x = ring_x_pos)
     x_line_index = np.argmin(np.abs(xGrid - ringPos[-1][0]))
     omega_y_centerline = omega_y_line[x_line_index, :]  # (along z)
+    expected_omega_y_centerline = expected_omega_y_centerline[x_line_index, :]
 
-    # Optional: expected profile
-    expected_omega_y = np.zeros_like(zGrid)  # placeholder
+
 
     # Plotting
     plt.figure(figsize=(4, 8))
     plt.plot(omega_y_centerline, zGrid, label=r'$\omega_y$ along centerline', linewidth=3)
-    plt.plot(expected_omega_y, zGrid, '--', label='Expected profile', linewidth=2)
+    plt.plot(expected_omega_y_centerline, zGrid, '--', label='Expected profile', linewidth=2)
     plt.xlabel(r'$\omega_y$')
     plt.ylabel('z')
     plt.title('Centerline Vorticity (ω_y)')

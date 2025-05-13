@@ -1,4 +1,5 @@
 import numpy as np
+import numpy as np
 import ReadData2 as rd
 from vtriClass import VortexRingInstance
 import matplotlib.pyplot as plt
