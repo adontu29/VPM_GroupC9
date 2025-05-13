@@ -35,7 +35,7 @@ def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, particle_radius):
     radius_cubed = particle_radius ** 3
 
     for i in range(N):
-        for j in range(i+1,N):
+        for j in range(N):
             dx = x[i] - x[j]
             dy = y[i] - y[j]
             dz = z[i] - z[j]
@@ -71,7 +71,7 @@ def calcEnstrophy_vec_numba(x, y, z, wx, wy, wz, particle_radius):
 # -------------------------------
 DATA_PATH = "dataset2"
 FILENAME_TEMPLATE = "Vortex_Ring_{:04d}.vtp"
-TIMESTAMPS = np.arange(25, 8600, 250)  # Process every 10th file (10x speedup)
+TIMESTAMPS = np.arange(25, 8600, 500)  # Process every 10th file (10x speedup)
 
 enstrophies = []
 times = []
@@ -108,9 +108,10 @@ for stamp in TIMESTAMPS:
     #time_step_size = 5 * particle_distance**2 / ring_strength
     time_step_size=0.005808
     cumulative_time = time_step_size*stamp
-    print(calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz,particle_radius ))
+    print(calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz,float(Radius[stamp/25] )))
     # Enstrophy calculation
-    enstrophy = calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz,particle_radius )
+    print(stamp)
+    enstrophy = calcEnstrophy_vec_numba(x, y, z, Wx, Wy, Wz, float(Radius[stamp/25]))
     enstrophies.append(enstrophy/(0.2*4*math.pi*math.pi))
     times.append(cumulative_time)
 
