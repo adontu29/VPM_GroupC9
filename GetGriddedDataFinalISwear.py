@@ -25,6 +25,7 @@ timeStamps = np.arange(0, no_timesteps * time_step_size, time_step_size)
 
 # ============================ Numba-accelerated Functions ============================
 
+print(timeStamps[300])
 @njit(fastmath=True)
 def reg_zeta(rho, radius):
     rho = rho / radius
@@ -64,7 +65,7 @@ def compute_vorticity_numba(grid_points, particle_pos, Gamma, particle_radius):
 
 # ============================ Vorticity Computation Wrapper ============================
 
-def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius, XGrid, YGrid, ZGrid, ringPos):
+def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius, XGrid, YGrid, ZGrid, ringPos,time):
     """
     Computes both numerical and analytical vorticity fields.
     """
@@ -76,9 +77,10 @@ def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius, X
     radial_distance_to_core = np.abs(r_yz - ring_radius)
     theta = np.arctan2(Z_shifted, Y_shifted)
 
-    vorticity_magnitude = (ring_strength / (np.pi * ring_thickness ** 2)) * \
-                          np.exp(-radial_distance_to_core ** 2 / ring_thickness ** 2)
-    x_decay = np.exp(-X_shifted ** 2 / ring_thickness ** 2)
+    ring_thickness_t = np.sqrt(4 * particle_viscosity * time + ring_thickness ** 2)
+    vorticity_magnitude = (ring_strength / (np.pi * ring_thickness_t ** 2)) * \
+                          np.exp(-radial_distance_to_core ** 2 / ring_thickness_t ** 2)
+    x_decay = np.exp(-X_shifted ** 2 / ring_thickness_t ** 2)
 
     omega_x_analytic = np.zeros_like(XGrid)
     omega_y_analytic = -vorticity_magnitude * np.sin(theta) * x_decay
@@ -95,9 +97,9 @@ def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius, X
 
 # ============================ Grid Setup ============================
 
-xGrid = np.arange(-0.3, 9, 0.1)
-yGrid = np.arange(-1.5, 1.5, 0.1)
-zGrid = np.arange(-1.5, 1.5, 0.1)
+xGrid = np.arange(-0.3, 9.5, 0.1)
+yGrid = np.arange(-1.5, 1.5, 0.05)
+zGrid = np.arange(-1.5, 1.5, 0.05)
 
 XGrid, YGrid, ZGrid = np.meshgrid(xGrid, yGrid, zGrid, indexing='ij')
 grid_points = np.stack((XGrid.ravel(), YGrid.ravel(), ZGrid.ravel()), axis=-1)
@@ -118,6 +120,8 @@ for i in range(344, 345):  # Only 1 timestep for now
         print(f"Error: File {filename} not found.")
         continue
 
+    print(Radius[1][0])
+
     ringRadius[i], ringPos0 = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
     ringPos.append(np.array(ringPos0))
     print(ringPos[-1])
@@ -126,7 +130,7 @@ for i in range(344, 345):  # Only 1 timestep for now
     Gamma = np.stack((Wx, Wy, Wz), axis=-1)
 
     omega_grid, omega_grid_analytical = compute_vorticity_field(
-        grid_points, particle_pos, Gamma, particle_radius, XGrid, YGrid, ZGrid, ringPos[-1]
+        grid_points, particle_pos, Gamma, Radius[i][0], XGrid, YGrid, ZGrid, ringPos[-1],timeStamps[i]
     )
 
     # Reshape to 3D grids
