@@ -58,7 +58,6 @@ for i in range(len(timeStamps)):
         print(f"Error: File {filename} not found.")
         continue
 
-    print(Radius[0], Radius[1], Radius[2])
 
     # Debugged: Properly unpack ring position
     ringRadius[i], ringPos0 = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
@@ -91,7 +90,7 @@ for i in range(len(timeStamps)):
         Velocity[i] = calcDist(ringPos[i+1],ringPos[i-1])/time_step_size/2
     if (i!=0):
         eps = 1e-8
-        C = -0.558 - (3.6716*particle_viscosity * timeStamps[i])/ring_radius**2
+        C = -0.558 - (3.6716*particle_viscosity * (timeStamps[i] + 50))/ring_radius**2
         ring_thickness_t = np.sqrt(4*particle_viscosity*timeStamps[i] + ring_thickness**2)
         term_a = ring_strength/ (4 * np.pi * ring_radius)
         term_b = np.log(8 * ring_radius/ring_thickness_t) + C
