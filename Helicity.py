@@ -1,6 +1,7 @@
 import numpy as np
 import ReadData as rd
 import matplotlib.pyplot as plt
+from numba import jit
 
 
 def compute_helicity_vectorized(x, Gamma, sigma):
@@ -38,14 +39,20 @@ def compute_helicity_vectorized(x, Gamma, sigma):
     H_sigma *= 1 / (4 * np.pi)
 
     return H_sigma
-timeStamps = np.arange(0,1575,25)
-timestep = 1
+timeStamps = np.arange(0,8600,25)
+ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
+ring_radius     = 1.0               # m, radius of the vortex ring
+ring_strength   = 1.0               # m²/s, vortex strength
+ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
+particle_distance  = 0.25*ring_thickness
+
+timestep = 5 * particle_distance**2/ring_strength
 ttab=[]
 htab=[]
 for i in range(len(timeStamps)):
     stringtime = str(timeStamps[i]).zfill(4)
     # Debugged: Ensure correct file path format
-    filename = f'dataset/Vortex_Ring_DNS_Re7500_{stringtime}.vtp'
+    filename = f'dataset2/Vortex_Ring_{stringtime}.vtp'
 
     try:
         X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance(filename)
@@ -63,4 +70,5 @@ plt.ylabel('Helicity (|H|)')
 plt.xlabel('Time')
 plt.title('Helicity vs Time')
 plt.grid(True, which="both", ls="--")
+plt.ylim(-1, 1)
 plt.show()

@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import ReadData2 as rd
 from vtriClass import VortexRingInstance
 import matplotlib.pyplot as plt
@@ -98,10 +99,10 @@ def calcEnstrophy(ringInstance):
         np.asarray(ringInstance.radius, dtype=np.float64)
     )
 
-DATA_PATH = "dataset"
-FILENAME_TEMPLATE = "Vortex_Ring_DNS_Re7500_{:04d}.vtp"
+DATA_PATH = "dataset2"
+FILENAME_TEMPLATE = "Vortex_Ring_{:04d}.vtp"
 #TIMESTAMPS = np.arange(25, 1575, 25)  # in steps of 25
-TIMESTAMPS = np.arange(25, 1575, 25)
+TIMESTAMPS = np.arange(25, 8600, 225)
 
 enstrophies = []
 times = []
@@ -113,8 +114,9 @@ for stamp in TIMESTAMPS:
 
     vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
 
-    times.append(stamp)
-    enstrophies.append(calcEnstrophy(vtrInstance))
+    time_step_size=0.005808
+    times.append(stamp * time_step_size)
+    enstrophies.append(calcEnstrophy(vtrInstance)/math.pi)
 
 
 plt.plot(times, enstrophies)
