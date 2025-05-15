@@ -3,7 +3,7 @@ import math
 import vtk
 import numpy as np
 import matplotlib.pyplot as plt
-from numba import jit,njit
+from numba import jit,njit,prange,float64
 
 ring_center0 = np.array([0.0, 0.0, 0.0])  # m, center of the vortex ring
 ring_radius0 = 1.0  # m, radius of the vortex ring
@@ -174,3 +174,31 @@ def getStrength(Wx, Wy, Wz):
     print("Getting Strength ... ")
     strength = np.sum(np.sqrt(Wx ** 2 + Wy ** 2 + Wz ** 2) / (2 * np.pi)) # 1/s
     return strength
+from numba import njit, prange
+import numpy as np
+
+@njit(parallel=True)
+def getHelicity(X,Y,Z,Wx,Wy,Wz,sigma):
+    x = np.stack((X, Y, Z), axis=-1)
+    Gamma = np.stack((Wx, Wy, Wz), axis=-1)
+    N = x.shape[0]
+    H_sigma = 0.0
+
+    for p in prange(N):  # Outer loop parallelized
+        for q in range(N):
+            dx0 = x[p,0] - x[q,0]
+            dx1 = x[p,1] - x[q,1]
+            dx2 = x[p,2] - x[q,2]
+
+            cx = Gamma[p,1]*Gamma[q,2] - Gamma[p,2]*Gamma[q,1]
+            cy = Gamma[p,2]*Gamma[q,0] - Gamma[p,0]*Gamma[q,2]
+            cz = Gamma[p,0]*Gamma[q,1] - Gamma[p,1]*Gamma[q,0]
+
+            r2 = dx0**2 + dx1**2 + dx2**2 + sigma**2
+            denominator = r2 ** 1.5
+
+            contribution = (dx0 * cx + dx1 * cy + dx2 * cz) / denominator
+            H_sigma += contribution
+
+    H_sigma *= 1 / (4 * np.pi)
+    return H_sigma
