@@ -5,10 +5,10 @@ from vtriClass import VortexRingInstance
 from Circulation_Impulse import compute_linear_impulse, compute_angular_impulse
 
 # Configuration
-DATA_PATH = "dataset"
-FILENAME_TEMPLATE = "Vortex_Ring_DNS_Re7500_{:04d}.vtp"
-TIMESTAMPS = np.arange(25, 1575, 25)  # time values, step of 25
-DT = 0.005  # Optional, used for time axis scaling if needed
+DATA_PATH = "dataset2"
+FILENAME_TEMPLATE = "Vortex_Ring_{:04d}.vtp"
+TIMESTAMPS = np.arange(25, 8601, 25)  # time values, step of 25
+DT = 0.001  # Optional, used for time axis scaling if needed
 
 # Storage for results
 linear_impulses = []
