@@ -16,7 +16,7 @@ def compute_linear_impulse(X, Y, Z, Wx, Wy, Wz):
     
     impulses = np.cross(positions, strengths)
 
-    linear_impulse = (0.5 * np.sum(impulses, axis=0))/m.pi
+    linear_impulse = 0.5 * np.sum(impulses, axis=0)
 
     return linear_impulse
 

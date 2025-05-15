@@ -7,23 +7,28 @@ import ReadData as rd
 def calcDist (instance1, instance2):
     return  m.sqrt((instance1[0] - instance2[0])**2 + (instance1[1] - instance2[1])**2 + (instance1[2] - instance2[2])**2)
 
-ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
-ring_radius     = 1.0               # m, radius of the vortex ring
-ring_strength   = 1.0               # m²/s, vortex strength
-ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
+ring_center   = np.array([0.0, 0.0, 0.0]) # m, center of the vortex
+ring_radius   = 1.0              # m, radius of the vortex ring
+ring_strength = 1.0              # m²/s, vortex strength
+ring_thickness = 0.2*ring_radius # m thickness of the vortex ring
 
+# ==================================================
+# Particle Distribution Setup
+# ==================================================
 
-### Particle Distribution Setup
-Re = 7500                                   # Reynolds number
-particle_distance  = 0.25*ring_thickness    # m
+Re = 750                                   # Reynolds number
+particle_distance  = 0.22*ring_thickness    # m
 particle_radius    = 0.8*particle_distance**0.5  # m
 particle_viscosity = ring_strength/Re       # m²/s, kinematic viscosity
-time_step_size     = 25*5 * particle_distance**2/ring_strength  # s
-n_time_steps       = int( 20*ring_radius**2 / ring_strength / time_step_size)
+time_step_size     = 25 * 3 * particle_distance**2/ring_strength  # s
+n_time_steps       = int( 100*ring_radius**2 / ring_strength / time_step_size)
+max_timesteps = 8600
+no_timesteps = 8600/25+1
 
 
-timeStampsNames = np.arange(0,1575,25)
-timeStamps = np.arange(0, (1575/25)*time_step_size, time_step_size)
+timeStampsNames = np.arange(0,max_timesteps+1,25)
+timeStamps = np.arange(0, no_timesteps*time_step_size, time_step_size)
+
 
 print(len(timeStampsNames))
 print(len(timeStamps))
@@ -44,14 +49,16 @@ gamma = np.ones(len(timeStamps))
 
 for i in range(len(timeStamps)):
     stringtime = str(timeStampsNames[i]).zfill(4)
-    # Debugged: Ensure correct file path format
-    filename = f'dataset/Vortex_Ring_DNS_Re7500_{stringtime}.vtp'
+    print(stringtime)
+    filename = f'dataset2/Vortex_Ring_{stringtime}.vtp'
 
     try:
         X, Y, Z, U, V, W, Wx, Wy, Wz, Radius, Group_ID, Viscosity, Viscosity_t = rd.readVortexRingInstance(filename)
     except FileNotFoundError:
         print(f"Error: File {filename} not found.")
         continue
+
+    print(Radius[0], Radius[1], Radius[2])
 
     # Debugged: Properly unpack ring position
     ringRadius[i], ringPos0 = rd.getRingPosRadius(X, Y, Z, Wx, Wy, Wz)
@@ -84,7 +91,13 @@ for i in range(len(timeStamps)):
         Velocity[i] = calcDist(ringPos[i+1],ringPos[i-1])/time_step_size/2
     if (i!=0):
         eps = 1e-8
-        saffmanVelocity[i] = (ring_strength/(4*np.pi*ringRadius[i]))*(np.log(4*ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]))) -0.558 - 3.6716*nu[i]*timeStamps[i]/ringRadius[i])
+        C = -0.558 - (3.6716*particle_viscosity * timeStamps[i])/ring_radius**2
+        ring_thickness_t = np.sqrt(4*particle_viscosity*timeStamps[i] + ring_thickness**2)
+        term_a = ring_strength/ (4 * np.pi * ring_radius)
+        term_b = np.log(8 * ring_radius/ring_thickness_t) + C
+        saffmanVelocity[i] = term_a * term_b
+        #saffmanVelocity[i] = (ring_strength/(4*np.pi*ring_radius))*(np.log(4*ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]))) -0.558 - 3.6716*nu[i]*timeStamps[i]/ringRadius[i]**2)
+        #saffmanVelocity[i] = (ring_strength/(4*np.pi*ringRadius[i]))*(np.log(8*(ringRadius[i]/ringCoreRadius[i]))-0.558-3.6716*ringCoreRadius[i]**2/4/ringRadius[i]**2)
 
 # for i in range(len(ringStrengthGrid)):
 #     saffManVelocityGrid[i] = (ringStrengthGrid[i] / (4 * np.pi * ringRadius[i])) * (np.log(4 * ringRadius[i] / (np.sqrt(nu[i] * timeStamps[i]) + eps)) - 0.558 - 3.6716 * nu[i] *
@@ -92,9 +105,15 @@ for i in range(len(timeStamps)):
 
 fig1 = plt.figure(1)
 ax = plt.axes()
-numVel = ax.plot(timeStamps, Velocity, 'b-')
-safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-')
+numVel = ax.plot(timeStamps, Velocity, 'b-', label='Numerical Velocity')
+safVel = ax.plot(timeStamps[1:len(timeStamps)-1], saffmanVelocity[1:len(timeStamps)-1], 'r-', label='Saffman Velocity')
 # safVelGrid = ax.plot(timeStamps[1:(len(ringStrengthGrid))],saffManVelocityGrid[1:(len(ringStrengthGrid)+1)],'g-'),
+ax.legend()
+ax.set_title("Velocity Comparison")
+ax.set_xlabel("Time")
+ax.set_ylabel("Velocity")
+
+
 fig2 = plt.figure(2)
 ax = plt.axes()
 ax.plot(timeStamps, ringCoreRadius, 'b-')
