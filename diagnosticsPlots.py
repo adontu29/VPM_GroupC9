@@ -2,6 +2,7 @@ import numpy as np
 import math as m
 import matplotlib.pyplot as plt
 import ReadData as rd
+import graphing as grph
 
 def getArrays(timeStampsNames):
     Velocity = np.zeros((len(timeStampsNames)))
@@ -127,72 +128,12 @@ elif dataset == 750:
 
     timeStamps = timeStampsNames * timeStep
     
+    with open ("kineticEnergyResults.txt","w") as file:
+        for i  in range(len(KineticEnergy)):
+            file.write(str(i) + " " + str(KineticEnergy[i]) + "\n")
 
-   
-plt.figure(figsize=(10, 6))
-plt.plot(timeStamps[1:], KineticEnergy[1:], marker='o', linestyle='-', color='teal', linewidth=2, markersize=4)
-
-plt.title("Kinetic Energy of Vortex Ring", fontsize=16)
-plt.xlabel("Time", fontsize=14)
-plt.ylabel("Kinetic Energy", fontsize=14)
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.tight_layout()
-plt.ylim(0.1, 0.5)  # Tight y-limits to emphasize near-constancy
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-
-# Optional: Save the figure
-plt.savefig("vortex_ring_kinetic_energy.png", dpi=300)
-
-plt.show()
-
-plt.figure(figsize=(10, 6))
-plt.plot(timeStamps[1:], Strength[1:], marker='s', linestyle='-', color='darkorange', linewidth=2, markersize=4)
-
-plt.title("Vortex Ring Strength Over Time", fontsize=16)
-plt.xlabel("File Index", fontsize=14)
-plt.ylabel("Circulation Strength", fontsize=14)
-plt.ylim(0.9, 1)  # Tight y-limits to emphasize near-constancy
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.tight_layout()
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-
-# Optional: Save the figure
-# plt.savefig("vortex_ring_strength.png", dpi=300)
-
-plt.show()
-
-plt.figure(figsize=(10, 6))
-plt.plot(timeStamps[1:], KineticEnergy[1:], marker='o', linestyle='-', color='teal', linewidth=2, markersize=4)
-
-plt.title("Kinetic Energy of Vortex Ring", fontsize=16)
-plt.xlabel("Time", fontsize=14)
-plt.ylabel("Kinetic Energy", fontsize=14)
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.tight_layout()
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-
-# Optional: Save the figure
-plt.savefig("vortex_ring_kinetic_energy.png", dpi=300)
-
-plt.show()
-
-plt.figure(figsize=(10, 6))
-plt.plot(timeStamps[1:], Strength[1:], marker='s', linestyle='-', color='darkorange', linewidth=2, markersize=4)
-
-plt.title("Vortex Ring Strength Over Time", fontsize=16)
-plt.xlabel("File Index", fontsize=14)
-plt.ylabel("Circulation Strength", fontsize=14)
-plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-plt.tight_layout()
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-
-# Optional: Save the figure
-# plt.savefig("vortex_ring_strength.png", dpi=300)
-
-plt.show()
-
-
+    with open ("strengthResults.txt","w") as file:
+        for i  in range(len(Strength)):
+            file.write(str(i) + " " + str(Strength[i]) + "\n")
+    
+    
