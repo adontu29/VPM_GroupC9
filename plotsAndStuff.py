@@ -46,11 +46,11 @@ no_timesteps        = int(8600 / 25 + 1)
 # ======================
 timeStamps = np.arange(0, max_timesteps, 25) * time_step_size
 saffmanEnergy = np.zeros(len(timeStamps))
-
 for i in range(len(timeStamps)):
-    C =-1.15
+    eps = 1e-8
+    C = -3/2
     ring_thickness_t = np.sqrt(4 * particle_viscosity * timeStamps[i] + ring_thickness**2)
-    term_a = 0.5 * ring_radius * ring_strength ** 2
+    term_a = 0.5
     term_b = np.log(8 * ring_radius / ring_thickness_t) + C
     saffmanEnergy[i] = term_a * term_b
     
@@ -58,10 +58,10 @@ for i in range(len(timeStamps)):
 # Plotting
 # ======================
 # If you want to compare both energies:
-grph.getDoubleGraph(timeStamps, timeStamps, kineticEnergy, saffmanEnergy,
-                    "Kinetic Energy", "Saffman Model Kinetic Energy", 0.35, "r", "b")
+grph.getDoubleGraph(timeStamps[::5], timeStamps[::5], kineticEnergy[::5], saffmanEnergy[::5],
+                    "Kinetic Energy", "Saffman Model Kinetic Energy", 0.7, "r", "b")
 plt.show()
 # If just plotting kinetic energy:
 # grph.getGraph(timeStamps, kineticEnergy, "Kinetic Energy", 0.35)
-grph.getGraph(timeStamps, strength, "Strength", 1)
+grph.getGraph(timeStamps[::5], strength[::5], "Strength", 1)
 plt.show()
