@@ -59,9 +59,9 @@ for i in range(len(timeStamps)):
 # ======================
 # If you want to compare both energies:
 grph.getDoubleGraph(timeStamps[::5], timeStamps[::5], kineticEnergy[::5], saffmanEnergy[::5],
-                    "Kinetic Energy", "Saffman Model Kinetic Energy", 0.7, "r", "b")
+                    "Kinetic Energy", "Saffman Model Kinetic Energy", 0.7, "r", "b", "Time (s)" , "Kinetic Energy (J)")
 plt.show()
 # If just plotting kinetic energy:
 # grph.getGraph(timeStamps, kineticEnergy, "Kinetic Energy", 0.35)
-grph.getGraph(timeStamps[::5], strength[::5], "Strength", 1)
+grph.getGraph(timeStamps[::5], strength[::5], "Strength", 1, "Time (s)", "Strength (m^2/s)")
 plt.show()
