@@ -2,6 +2,7 @@ import numpy as np
 import ReadData2 as rd
 from vtriClass import VortexRingInstance
 import matplotlib.pyplot as plt
+from graphing import getGraph
 from numba import njit
 
 """def calcEnstrophy(ringInstance):
@@ -113,9 +114,11 @@ for stamp in TIMESTAMPS:
 
     vtrInstance = VortexRingInstance(x,y,z,u,v,w,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t)
 
-    times.append(stamp)
+    time_step_size=0.005808
+    times.append(stamp * time_step_size)
     enstrophies.append(calcEnstrophy(vtrInstance))
 
 
-plt.plot(times, enstrophies)
+getGraph(times, enstrophies, "Enstrophy", 4)
+
 plt.show()
