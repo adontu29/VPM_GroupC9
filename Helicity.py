@@ -1,7 +1,7 @@
 import numpy as np
 import ReadData as rd
 import matplotlib.pyplot as plt
-
+from graphing import getGraph
 
 def compute_helicity_vectorized(x, Gamma, sigma):
     """
@@ -58,9 +58,12 @@ for i in range(len(timeStamps)):
     print(H)
     ttab.append(float(stringtime)*timestep)
     htab.append(H)
-plt.plot(ttab, htab)
+
+getGraph(ttab,htab,label='asdas', colour='b', ylimit = 8)
+plt.show()
+"""plt.plot(ttab, htab)
 plt.ylabel('Helicity (|H|)')
 plt.xlabel('Time')
 plt.title('Helicity vs Time')
 plt.grid(True, which="both", ls="--")
-plt.show()
+plt.show()"""
