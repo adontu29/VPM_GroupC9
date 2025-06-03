@@ -12,17 +12,23 @@ degree = 3
 def RadiusVelocityPlotsFromMaxVorticity():
 # === Initial Conditions ===
 
-    ring_center     = np.array([0.0, 0.0, 0.0])   # m, center of the vortex ring
-    ring_radius     = 1.0               # m, radius of the vortex ring
-    ring_strength   = 1.0               # m²/s, vortex strength
-    ring_thickness  = 0.2*ring_radius   # m, thickness of the vortex ring
+    ring_center   = np.array([0.0, 0.0, 0.0]) # m, center of the vortex
+    ring_radius   = 1.0              # m, radius of the vortex ring
+    ring_strength = 1.0              # m²/s, vortex strength
+    ring_thickness = 0.2*ring_radius # m thickness of the vortex ring
 
-    Re = 7500                                   # Reynolds number
-    particle_distance  = 0.25*ring_thickness    # m
+    # ==================================================
+    # Particle Distribution Setup
+    # ==================================================
+
+    Re = 750                                   # Reynolds number
+    particle_distance  = 0.22*ring_thickness    # m
     particle_radius    = 0.8*particle_distance**0.5  # m
     particle_viscosity = ring_strength/Re       # m²/s, kinematic viscosity
-    time_step_size     = 5 * particle_distance**2/ring_strength  # s
-    n_time_steps       = int( 20*ring_radius**2 / ring_strength / time_step_size)
+    time_step_size     = 25 * 3 * particle_distance**2/ring_strength  # s
+    n_time_steps       = int( 100*ring_radius**2 / ring_strength / time_step_size)
+    max_timesteps = 8600
+    no_timesteps = 8600/25+1
 
     # calculates the h value for numerical differentiation 
     def calcDist (instance1, instance2):
