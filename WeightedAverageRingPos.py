@@ -2,7 +2,7 @@ import numpy as np
 import math as m
 import matplotlib.pyplot as plt
 import ReadData as rd
-
+from graphing import getGraph
 
 def calcDist (instance1, instance2):
     return  m.sqrt((instance1[0] - instance2[0])**2 + (instance1[1] - instance2[1])**2 + (instance1[2] - instance2[2])**2)
@@ -90,7 +90,7 @@ for i in range(len(timeStamps)):
         Velocity[i] = calcDist(ringPos[i+1],ringPos[i-1])/time_step_size/2
     if (i!=0):
         eps = 1e-8
-        C = -0.558 - (3.6716*particle_viscosity * (timeStamps[i] + 50))/ring_radius**2
+        C = -0.558 - (3.6716*particle_viscosity * (timeStamps[i]))/ring_radius**2
         ring_thickness_t = np.sqrt(4*particle_viscosity*timeStamps[i] + ring_thickness**2)
         term_a = ring_strength/ (4 * np.pi * ring_radius)
         term_b = np.log(8 * ring_radius/ring_thickness_t) + C
@@ -121,6 +121,8 @@ fig3 = plt.figure(3)
 ax = plt.axes()
 ax.plot(timeStamps, ringRadius, 'b-')
 
+getGraph(timeStamps[0::8], Velocity[0::8], ylimit=0.28, label='Computed Velocity')
+getGraph(timeStamps[1:len(timeStamps)-1:8], saffmanVelocity[1:len(timeStamps)-1:8], ylimit=0.28, label='Saffman Velocity', colour='b')
 plt.show()
 
 print(saffmanVelocity)

@@ -15,7 +15,7 @@ def getArrays(timeStampsNames):
 
 def updateDiagnostics(i,X,Y,Z,U,V,W,Wx,Wy,Wz,Radius,Group_ID,Viscosity,Viscosity_t):
     # Velocity[i] = 0
-    Strength[i] = rd.getStrength(Wx,Wy,Wz)
+    #Strength[i] = rd.getStrength(Wx,Wy,Wz)
     # Impulse[i] = rd.getImpulse()
     KineticEnergy[i] = rd.getKineticEnergy(X,Y,Z,Wx,Wy,Wz,Radius)
     # Helicity[i] = rd.getHelicity(X,Y,Z,Wx,Wy,Wz,Radius)
@@ -132,8 +132,8 @@ elif dataset == 750:
         for i  in range(len(KineticEnergy)):
             file.write(str(i) + " " + str(KineticEnergy[i]) + "\n")
 
-    with open ("strengthResults.txt","w") as file:
-        for i  in range(len(Strength)):
-            file.write(str(i) + " " + str(Strength[i]) + "\n")
+    # with open ("strengthResults.txt","w") as file:
+    #     for i  in range(len(Strength)):
+    #         file.write(str(i) + " " + str(Strength[i]) + "\n")
     
     

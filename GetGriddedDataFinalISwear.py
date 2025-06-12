@@ -65,10 +65,7 @@ def compute_vorticity_numba(grid_points, particle_pos, Gamma, particle_radius):
 
 # ============================ Vorticity Computation Wrapper ============================
 
-def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius, XGrid, YGrid, ZGrid, ringPos,time):
-    """
-    Computes both numerical and analytical vorticity fields.
-    """
+def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius, XGrid, YGrid, ZGrid, ringPos, time):
     Y_shifted = YGrid - ringPos[1]
     Z_shifted = ZGrid - ringPos[2]
     X_shifted = XGrid - ringPos[0]
@@ -83,8 +80,8 @@ def compute_vorticity_field(grid_points, particle_pos, Gamma, particle_radius, X
     x_decay = np.exp(-X_shifted ** 2 / ring_thickness_t ** 2)
 
     omega_x_analytic = np.zeros_like(XGrid)
-    omega_y_analytic = -vorticity_magnitude * np.sin(theta) * x_decay
-    omega_z_analytic = vorticity_magnitude * np.cos(theta) * x_decay
+    omega_y_analytic = -vorticity_magnitude * np.sin(theta)
+    omega_z_analytic = vorticity_magnitude * np.cos(theta)
 
     omega_grid_analytical = np.stack((
         omega_x_analytic.ravel(),
@@ -109,7 +106,7 @@ ringRadius = np.ones(len(timeStamps))
 
 # ============================ Time Loop ============================
 
-for i in range(344, 345):  # Only 1 timestep for now
+for i in range(0, 1):  # Only 1 timestep for now
     stringtime = str(timeStampsNames[i]).zfill(4)
     print(f"Processing timestep: {stringtime}")
     filename = f'dataset2/Vortex_Ring_{stringtime}.vtp'
@@ -130,10 +127,9 @@ for i in range(344, 345):  # Only 1 timestep for now
     Gamma = np.stack((Wx, Wy, Wz), axis=-1)
 
     omega_grid, omega_grid_analytical = compute_vorticity_field(
-        grid_points, particle_pos, Gamma, Radius[i][0], XGrid, YGrid, ZGrid, ringPos[-1],timeStamps[i]
+        grid_points, particle_pos, Gamma, Radius[i][0], XGrid, YGrid, ZGrid, ringPos[-1], timeStamps[i]
     )
 
-    # Reshape to 3D grids
     omega_x = omega_grid[:, 0].reshape(XGrid.shape)
     omega_y = omega_grid[:, 1].reshape(YGrid.shape)
     omega_z = omega_grid[:, 2].reshape(ZGrid.shape)
@@ -142,21 +138,34 @@ for i in range(344, 345):  # Only 1 timestep for now
     omega_y_analytical = omega_grid_analytical[:, 1].reshape(YGrid.shape)
     omega_z_analytical = omega_grid_analytical[:, 2].reshape(ZGrid.shape)
 
-    # ============================ Plotting Cross-Section ============================
-
     ring_y_pos = ringPos[-1][1]
     y_plane_index = np.argmin(np.abs(yGrid - ring_y_pos))
     omega_y_slice = omega_y[:, y_plane_index, :]
 
-    plt.figure(figsize=(8, 6))
-    X, Z = np.meshgrid(xGrid, zGrid, indexing='ij')
-    plt.contourf(X, Z, omega_y_slice, levels=50, cmap='viridis')
-    plt.colorbar(label='ω_y [1/s]')
-    plt.xlabel('x [m]')
-    plt.ylabel('z [m]')
-    plt.title(f'Vorticity ω_y in XZ-plane at y = {ring_y_pos:.2f}')
-    plt.axis('equal')
-    plt.tight_layout()
+    x_margin = 3 * ring_thickness
+    z_margin = 3 * ring_radius
+    ring_x_pos = ringPos[-1][0]
+    ring_z_pos = ringPos[-1][2]
+
+    x_crop_indices = np.where((xGrid >= ring_x_pos - x_margin) & (xGrid <= ring_x_pos + x_margin))[0]
+    z_crop_indices = np.where((zGrid >= ring_z_pos - z_margin) & (zGrid <= ring_z_pos + z_margin))[0]
+
+    omega_y_crop = omega_y_slice[np.ix_(x_crop_indices, z_crop_indices)]
+    X_crop, Z_crop = np.meshgrid(xGrid[x_crop_indices], zGrid[z_crop_indices], indexing='ij')
+
+    # === Plot discrete vorticity as scatter plot near the vortex ring ===
+    plt.figure(figsize=(6, 5))
+    X_flat = X_crop.ravel()
+    Z_flat = Z_crop.ravel()
+    omega_flat = omega_y_crop.ravel()
+
+    num_bins = 15
+    vmin = np.min(omega_flat)
+    vmax = np.max(omega_flat)
+    levels = np.linspace(vmin, vmax, num_bins)
+    cmap = plt.get_cmap('RdBu_r', num_bins)
+
+
 
     # ============================ Centerline Vorticity Plot ============================
 
@@ -170,13 +179,32 @@ for i in range(344, 345):  # Only 1 timestep for now
 
     print(np.max(omega_y_centerline))
 
-    plt.figure(figsize=(4, 8))
-    plt.plot(omega_y_centerline, zGrid, label=r'$\omega_y$ (computed)', linewidth=3)
-    plt.plot(expected_omega_y_centerline, zGrid, '--', label='Analytical', linewidth=2)
-    plt.xlabel(r'$\omega_y$')
-    plt.ylabel('z')
-    plt.title('Centerline Vorticity ω_y')
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend()
+    fig, axs = plt.subplots(1, 2, figsize=(14, 6))
+
+    # === Scatter Plot (Left Panel) ===
+    sc = axs[0].scatter(X_flat, Z_flat, c=omega_flat, cmap=cmap, s=20, edgecolor='none', vmin=vmin, vmax=vmax)
+    cbar = fig.colorbar(sc, ax=axs[0], ticks=levels)
+    cbar.set_label('ω_y [1/s]', fontsize=12)
+
+    axs[0].set_xlabel('x [m]', fontsize=12)
+    axs[0].set_ylabel('z [m]', fontsize=12)
+    axs[0].set_title(f'Discrete Scatter Vorticity\nNear Vortex Ring at y = {ring_y_pos:.2f}', fontsize=14)
+    axs[0].axis('equal')
+    axs[0].set_facecolor('#f8f8f8')
+
+    # === Centerline Plot (Right Panel) ===
+    axs[1].plot(omega_y_centerline, zGrid / ring_radius, label=r'$\omega_y$ (computed)', color='navy', linewidth=3)
+    axs[1].plot(expected_omega_y_centerline, zGrid / ring_radius, '--', label='Expected profile', color='green',
+                linewidth=2)
+
+    axs[1].set_xlabel(r'$\omega_y$', fontsize=14)
+    axs[1].set_ylabel(r'$z/R_0$', fontsize=14)
+    axs[1].set_title('Centerline Vorticity', fontsize=16)
+    axs[1].tick_params(labelsize=12)
+    axs[1].grid(True, linestyle='--', alpha=0.5)
+    axs[1].legend(fontsize=12)
+    axs[1].set_facecolor('#f0f0f5')
+
     plt.tight_layout()
     plt.show()
+

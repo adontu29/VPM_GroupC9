@@ -149,18 +149,29 @@ def getKineticEnergy(X,Y,Z,Wx,Wy,Wz,radius):
             norm_sq = dx*dx + dy*dy + dz*dz
             norm = np.sqrt(norm_sq)
             rho = norm / sig
+            dot_apaq = Wx[i] * Wx[j] + Wy[i] * Wy[j] + Wz[i] * Wz[j]
+            dot_diffap = Wx[i] * dx + Wy[i] * dy + Wz[i] * dz
+            dot_diffaq = Wx[j] * dx + Wy[j] * dy + Wz[j] * dz
 
-            # ap[i] and aq[j] dot product
-            dot_apaq = Wx[i]*Wx[j] + Wy[i]*Wy[j] + Wz[i]*Wz[j]
-            
-            # dot_diffap and dot_diffaq
-            dot_diffap = Wx[i]*dx + Wy[i]*dy + Wz[i]*dz
-            dot_diffaq = Wx[j]*dx + Wy[j]*dy + Wz[j]*dz
+            term1 = 2 * rho / np.sqrt(rho ** 2 + 1) * dot_apaq
 
-            term1 = (2*rho)/np.sqrt(rho**2 + 1) * dot_apaq
-            term2 = (rho**3)/( (rho**2 + 1)**1.5 ) * (dot_diffap * dot_diffaq) / norm_sq
-            contribution = (1.0 / norm) * (term1 + term2 - dot_apaq)
+            raw = (dot_diffap * dot_diffaq) / norm_sq
+            term2 = rho ** 3 / ((rho ** 2 + 1) ** 1.5) * (raw - dot_apaq)
+
+            contribution = (term1 + term2) / norm
             E += contribution
+
+            # # ap[i] and aq[j] dot product
+            # dot_apaq = Wx[i]*Wx[j] + Wy[i]*Wy[j] + Wz[i]*Wz[j]
+            #
+            # # dot_diffap and dot_diffaq
+            # dot_diffap = Wx[i]*dx + Wy[i]*dy + Wz[i]*dz
+            # dot_diffaq = Wx[j]*dx + Wy[j]*dy + Wz[j]*dz
+            #
+            # term1 = (2*rho)/np.sqrt(rho**2 + 1) * dot_apaq
+            # term2 = (rho**3)/( (rho**2 + 1)**1.5 ) * (dot_diffap * dot_diffaq) / norm_sq
+            # contribution = (1.0 / norm) * (term1 + term2 - dot_apaq)
+            # E += contribution
 
         # Optional progress update (disable in performance runs)
         if i % 250 == 0:
