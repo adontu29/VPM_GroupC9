@@ -23,12 +23,12 @@ def getDoubleGraph(time1,time2,data1,data2,label1,label2,ylimit,color1,color2,xl
     plt.legend()
 
 
-data1= pd.read_csv('CSV-GROUPC9-enstrophy-stuff/Vorticity 6080.csv', sep=';', decimal=',').to_numpy()
-
-getGraph(data1[:,0], data1[:,1], label='Vorticity', ylimit=30, colour='r')
-
-plt.ylabel(r'$\omega^*$')
-plt.xlabel(r'$T$')
-
-
-plt.show()
+    # data1= pd.read_csv('CSV-GROUPC9-enstrophy-stuff/Vorticity 6080.csv', sep=';', decimal=',').to_numpy()
+    #
+    # getGraph(data1[:,0], data1[:,1], label='Vorticity', ylimit=30, colour='r')
+    #
+    # plt.ylabel(r'$\omega^*$')
+    # plt.xlabel(r'$T$')
+    #
+    #
+    # plt.show()
